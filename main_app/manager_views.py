@@ -119,6 +119,52 @@ def get_attendance_report(request):
         for report in reports
     ]
     return JsonResponse(data, safe=False)
+###############################################################################
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import Employee, AttendanceEmployee, AttendanceReport
+
+def take_employee_attendance(request):
+    return render(request, "manager_template/take_employee_attendance.html")
+
+@csrf_exempt
+def get_employees(request):
+    if request.method == "POST":
+        data = request.POST
+        employees = Employee.objects.all().values("id", "admin__first_name", "admin__last_name")
+
+        employee_list = [
+            {"id": emp["id"], "name": f"{emp['admin__first_name']} {emp['admin__last_name']}"}
+            for emp in employees
+        ]
+        return JsonResponse(employee_list, safe=False)
+
+@csrf_exempt
+def save_employee_attendance(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            date = data.get("date")
+            employees = data.get("employees")
+
+            # Create an attendance entry for the date
+            attendance_entry, created = AttendanceEmployee.objects.get_or_create(date=date)
+
+            # Save attendance for each employee
+            for emp in employees:
+                employee_obj = Employee.objects.get(id=emp["id"])
+                AttendanceReport.objects.update_or_create(
+                    employee=employee_obj,
+                    attendance=attendance_entry,
+                    defaults={"status": emp["status"]}
+                )
+
+            return JsonResponse({"message": "Attendance saved successfully"}, status=200)
+        except Exception as e:
+            return JsonResponse({"message": "Error: " + str(e)}, status=500)
+
 
 ###############################################################################
 @csrf_exempt

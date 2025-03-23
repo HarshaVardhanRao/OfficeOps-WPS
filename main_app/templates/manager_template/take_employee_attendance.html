@@ -1,0 +1,87 @@
+{% extends 'main_app/base.html' %}
+{% block content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Take Employee Attendance</h3>
+                    </div>
+                    <div class="card-body">
+                        <label for="employee_id">Employee ID</label>
+                        <input type="text" id="employee_id" class="form-control" placeholder="Enter Employee ID">
+                        <br>
+                        <label for="employee_select">Select Employee</label>
+                        <select id="employee_select" class="form-control">
+                            <option value="">-- Select Employee --</option>
+                            {% for employee in employees %}
+                                <option value="{{ employee.id }}">{{ employee.admin.email }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="card-footer">
+                        <button id="mark_attendance" class="btn btn-success btn-block">Mark Attendance</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Today's Attendance</h3>
+                        <input type="date" id="attendance_date" class="form-control">
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Check-in Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance_table">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.getElementById("mark_attendance").addEventListener("click", function() {
+        let employeeId = document.getElementById("employee_id").value || document.getElementById("employee_select").value;
+        if (!employeeId) {
+            alert("Please enter or select an employee!");
+            return;
+        }
+        fetch("{% url 'save_employee_attendance' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "employee_id=" + employeeId
+        }).then(response => response.json()).then(data => {
+            alert(data.message);
+            loadAttendance();
+        }).catch(error => console.error("Error:", error));
+    });
+    
+    function loadAttendance() {
+        let date = document.getElementById("attendance_date").value || new Date().toISOString().split("T")[0];
+        fetch("{% url 'get_attendance' %}?date=" + date)
+        .then(response => response.json())
+        .then(data => {
+            let table = document.getElementById("attendance_table");
+            table.innerHTML = "";
+            data.attendance.forEach(att => {
+                let row = `<tr><td>${att.employee}</td><td>${att.check_in}</td></tr>`;
+                table.innerHTML += row;
+            });
+        });
+    }
+    document.getElementById("attendance_date").addEventListener("change", loadAttendance);
+    window.onload = loadAttendance;
+</script>
+{% endblock content %}

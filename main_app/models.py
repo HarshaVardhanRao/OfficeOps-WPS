@@ -95,11 +95,17 @@ class Attendance(models.Model):
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+from datetime import datetime
+class AttendanceEmployee(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True)
+    check_in_time = models.TimeField(auto_now_add=True)
 
-
+    def __str__(self):
+        return f"{self.employee.admin.first_name} - {self.date} - {self.check_in_time}"
 class AttendanceReport(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.DO_NOTHING)
-    attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
+    attendance = models.ForeignKey(AttendanceEmployee, on_delete=models.CASCADE)
     status = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

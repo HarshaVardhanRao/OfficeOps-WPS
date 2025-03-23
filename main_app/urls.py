@@ -99,6 +99,10 @@ urlpatterns = [
     path('manager/save_student_attendance/', manager_views.save_student_attendance, name='save_student_attendance'),
     path('manager/get_attendance_dates/', manager_views.get_attendance_dates, name='get_attendance_dates'),
     path('manager/get_attendance_report/', manager_views.get_attendance_report, name='get_attendance_report'),
+    path('manager/take_employee_attendance/', views.manager_take_employee_attendance, name='take_employee_attendance'),
+    path('manager/save_employee_attendance/', views.save_employee_attendance, name='save_employee_attendance'),
+    path('manager/get_attendance/', views.get_attendance, name='get_attendance'),
+
 
 
 

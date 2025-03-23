@@ -48,7 +48,46 @@ def logout_user(request):
     if request.user != None:
         logout(request)
     return redirect("/")
+#################################################################################################
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Employee, AttendanceEmployee, AttendanceReport
+from datetime import datetime, date
 
+# Render Attendance Page
+def manager_take_employee_attendance(request):
+    employees = Employee.objects.all()
+    return render(request, 'manager_template/take_employee_attendance.html', {'employees': employees})
+
+# Save Attendance
+def save_employee_attendance(request):
+    if request.method == "POST":
+        employee_id = request.POST.get("employee_id")
+        employee = Employee.objects.get(id=employee_id)
+        today = date.today()
+        now = datetime.now().time()
+        
+        # Check if already checked in today
+        attendance, created = AttendanceEmployee.objects.get_or_create(date=today,employee=employee, check_in_time=now)
+        if not AttendanceReport.objects.filter(attendance=attendance, employee=employee).exists():
+            AttendanceReport.objects.create(attendance=attendance, employee=employee, status=True)
+            return JsonResponse({"message": "Attendance saved successfully!"})
+        else:
+            return JsonResponse({"message": "Employee already checked in today!"})
+
+    return JsonResponse({"message": "Invalid request"}, status=400)
+
+# Fetch Attendance Data
+def get_attendance(request):
+    selected_date = request.GET.get("date", date.today())
+    attendance = AttendanceEmployee.objects.filter(date=selected_date).first()
+    if attendance:
+        reports = AttendanceReport.objects.filter(attendance=attendance)
+        data = [{"employee": report.employee.admin.email, "check_in": report.check_in_time.strftime("%H:%M:%S")} for report in reports]
+        return JsonResponse({"attendance": data})
+    return JsonResponse({"attendance": []})
+
+##############################################################################################
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt

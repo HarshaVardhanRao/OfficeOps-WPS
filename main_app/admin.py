@@ -18,3 +18,5 @@ admin.site.register(AttendanceReport)
 admin.site.register(AttendanceReportStudent)
 admin.site.register(LeaveReportManager)
 admin.site.register(StudentProfile)
+admin.site.register(AttendanceEmployee)
+
