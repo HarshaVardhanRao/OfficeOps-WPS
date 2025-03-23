@@ -9,6 +9,9 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import UpdateView
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from .models import Attendance, AttendanceReport, Section
 
 from .forms import *
 from .models import *
@@ -459,23 +462,35 @@ def admin_view_attendance(request):
 
 
 @csrf_exempt
+
 def get_admin_attendance(request):
-    Section_id = request.POST.get('section')
-    attendance_date_id = request.POST.get('attendance_date_id')
-    try:
-        section = get_object_or_404(Section, id=Section_id)
-        attendance = get_object_or_404(Attendance, id=attendance_date_id)
-        attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
-        json_data = []
-        for report in attendance_reports:
-            data = {
-                "status": str(report.status),
-                "name": str(report.employee)
-            }
-            json_data.append(data)
-        return JsonResponse(json.dumps(json_data), safe=False)
-    except Exception as e:
-        return None
+    if request.method == "POST":
+        section_id = request.POST.get('section')
+        attendance_date_id = request.POST.get('attendance_date_id')
+
+        if not section_id or not attendance_date_id:
+            return JsonResponse({"error": "Missing required parameters"}, status=400)
+
+        try:
+            section = get_object_or_404(Section, id=section_id)
+            attendance = get_object_or_404(Attendance, id=attendance_date_id)
+            attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
+
+            json_data = [
+                {
+                    "status": report.status,
+                    "name": report.student.student  # Ensure correct field name
+                }
+                for report in attendance_reports
+            ]
+
+            return JsonResponse(json_data, safe=False)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
 
 
 def admin_view_profile(request):

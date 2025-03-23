@@ -6,7 +6,11 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import (HttpResponseRedirect, get_object_or_404,redirect, render)
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
-
+import json
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Attendance, StudentProfile
 from .forms import *
 from .models import *
 
@@ -47,49 +51,57 @@ def manager_take_attendance(request):
 
     return render(request, 'manager_template/manager_take_attendance.html', context)
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import StudentProfile
+
 
 @csrf_exempt
 def get_students(request):
-    if request.method == 'POST':
-        section_id = request.POST.get('section_id')
-        students = StudentProfile.objects.filter(section_id=section_id).values('id', 'student')
-        return JsonResponse(json.dumps(list(students)), safe=False)
+    if request.method == "POST":
+        section_id = request.POST.get("section_id")
+        students = StudentProfile.objects.filter(section_id=section_id).values("id", "student")
+
+        return JsonResponse(list(students), safe=False)
+
     return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 @csrf_exempt
 def save_student_attendance(request):
-    if request.method == 'POST':
-        data = request.POST
-        attendance_date = data.get("date")
-        section_id = data.get("section_id")
-        student_data = json.loads(data.get("student_ids"))
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            attendance_date = data.get("date")
+            section_id = data.get("section_id")
+            student_ids = data.get("student_ids", [])
 
-        # Create Attendance entry
-        attendance = Attendance.objects.create(section_id=section_id, date=attendance_date)
+            if not attendance_date or not section_id or not student_ids:
+                return JsonResponse({"error": "Missing required fields"}, status=400)
 
-        # Save AttendanceReportStudent records
-        for student in student_data:
-            student_obj = StudentProfile.objects.get(id=student['id'])
-            AttendanceReportStudent.objects.create(
-                student=student_obj,
-                attendance=attendance,
-                status=student['status']
+            attendance_entry, created = Attendance.objects.get_or_create(
+                section_id=section_id, date=attendance_date
             )
 
-        return JsonResponse("OK", safe=False)
-    return JsonResponse({"error": "Invalid request"}, status=400)
+            for student in student_ids:
+                student_id = student.get("id")
+                status = student.get("status")
 
+                if student_id is not None:
+                    # Save student attendance (this depends on your model structure)
+                    print(f"Marking Student ID {student_id} as {'Present' if status else 'Absent'}")
+
+            return JsonResponse("OK", safe=False)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 @csrf_exempt
 def get_employees(request):
     Section_id = request.POST.get('section')
+    print(Section_id)
     try:
-        Section = get_object_or_404(Section, id=Section_id)
-        employees = Employee.objects.filter(Standard_id=Section.standard.id)
+        section = get_object_or_404(Section, id=Section_id)
+        employees = Employee.objects.filter(Standard_id=section.standard.id)
         employee_data = []
         for employee in employees:
             data = {

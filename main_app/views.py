@@ -50,22 +50,75 @@ def logout_user(request):
     return redirect("/")
 
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from .models import Section, Attendance
+
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from .models import Section, Attendance
+
 @csrf_exempt
-def get_attendance(request):
-    Section_id = request.POST.get('Section')
-    try:
-        Section = get_object_or_404(Section, id=Section_id)
-        attendance = Attendance.objects.filter(Section=Section)
-        attendance_list = []
-        for attd in attendance:
-            data = {
+def get_attendance_student(request):
+    print("Received Request Method:", request.method)
+    print("Request Headers:", request.headers)
+    print("Raw Request Body:", request.body)
+
+    if request.method == "POST":
+        try:
+            # Handle both form-data and JSON body
+            if request.content_type == "application/json":
+                data = json.loads(request.body)
+                section_id = data.get("section")
+            else:
+                section_id = request.POST.get("section")
+
+            print("Extracted Section ID:", section_id)
+
+            if not section_id:
+                return JsonResponse({"error": "Missing section_id"}, status=400)
+
+            section_obj = get_object_or_404(Section, id=section_id)
+            attendance_records = Attendance.objects.filter(section=section_obj)
+
+            attendance_list = [
+                {
                     "id": attd.id,
-                    "attendance_date": str(attd.date)
-                    }
-            attendance_list.append(data)
-        return JsonResponse(json.dumps(attendance_list), safe=False)
-    except Exception as e:
-        return None
+                    "attendance_date": attd.date.strftime('%Y-%m-%d')
+                }
+                for attd in attendance_records
+            ]
+
+            return JsonResponse({"attendance": attendance_list}, status=200)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    elif request.method == "GET":
+        try:
+            attendance_records = Attendance.objects.all()
+
+            attendance_list = [
+                {
+                    "id": attd.id,
+                    "attendance_date": attd.date.strftime('%Y-%m-%d'),
+                    "section": attd.section.id if attd.section else None
+                }
+                for attd in attendance_records
+            ]
+
+            return JsonResponse({"attendance": attendance_list}, status=200)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method. Use GET or POST."}, status=405)
+
+
+
 
 
 def showFirebaseJS(request):
