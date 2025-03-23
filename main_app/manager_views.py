@@ -13,20 +13,20 @@ from .models import *
 
 def manager_home(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    total_employees = Employee.objects.filter(standard=manager.standard).count()
+    total_employees = Employee.objects.all().count()
     total_leave = LeaveReportManager.objects.filter(manager=manager).count()
-    Sections = Section.objects.filter(standard=manager.standard)
+    Sections = Section.objects.all()
     total_Section = Sections.count()
     attendance_list = Attendance.objects.filter(section__in=Sections)
     total_attendance = attendance_list.count()
     attendance_list = []
     Section_list = []
     for sec in Sections:
-        attendance_count = Attendance.objects.filter(section=Sec).count()
+        attendance_count = Attendance.objects.filter(section=sec).count()
         Section_list.append(sec.name)
         attendance_list.append(attendance_count)
     context = {
-        'page_title': 'Manager Panel - ' + str(manager.admin.last_name) + ' (' + str(manager.standard) + ')',
+        'page_title': 'Manager Panel - ' + str(manager.admin.last_name),
         'total_employees': total_employees,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
@@ -39,13 +39,49 @@ def manager_home(request):
 
 def manager_take_attendance(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    Sections = Section.objects.filter(standard=manager.standard)
+    Sections = Section.objects.all()
     context = {
         'Sections': Sections,
         'page_title': 'Take Attendance'
     }
 
     return render(request, 'manager_template/manager_take_attendance.html', context)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import StudentProfile
+
+@csrf_exempt
+def get_students(request):
+    if request.method == 'POST':
+        section_id = request.POST.get('section_id')
+        students = StudentProfile.objects.filter(section_id=section_id).values('id', 'student')
+        return JsonResponse(json.dumps(list(students)), safe=False)
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+@csrf_exempt
+def save_student_attendance(request):
+    if request.method == 'POST':
+        data = request.POST
+        attendance_date = data.get("date")
+        section_id = data.get("section_id")
+        student_data = json.loads(data.get("student_ids"))
+
+        # Create Attendance entry
+        attendance = Attendance.objects.create(section_id=section_id, date=attendance_date)
+
+        # Save AttendanceReportStudent records
+        for student in student_data:
+            student_obj = StudentProfile.objects.get(id=student['id'])
+            AttendanceReportStudent.objects.create(
+                student=student_obj,
+                attendance=attendance,
+                status=student['status']
+            )
+
+        return JsonResponse("OK", safe=False)
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @csrf_exempt
@@ -98,7 +134,7 @@ def save_attendance(request):
 
 def manager_update_attendance(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    Sections = Section.objects.filter(standard=manager.standard)
+    Sections = Section.objects.all()
     context = {
         'Sections': Sections,
         'page_title': 'Update Attendance'

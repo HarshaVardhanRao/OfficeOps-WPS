@@ -14,9 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
-
-from main_app.EditSalaryView import EditSalaryView
-
 from . import ceo_views, manager_views, employee_views, views
 
 urlpatterns = [
@@ -98,29 +95,26 @@ urlpatterns = [
     path("manager/fcmtoken/", manager_views.manager_fcmtoken, name='manager_fcmtoken'),
     path("manager/view/notification/", manager_views.manager_view_notification,
          name="manager_view_notification"),
-    path("manager/salary/add/", manager_views.manager_add_salary, name='manager_add_salary'),
-    path("manager/salary/edit/", EditSalaryView.as_view(),
-         name='edit_employee_salary'),
-    path('manager/salary/fetch/', manager_views.fetch_employee_salary,
-         name='fetch_employee_salary'),
+    path('manager/get_students/', manager_views.get_students, name='get_students'),
+    path('manager/save_student_attendance/', manager_views.save_student_attendance, name='save_student_attendance'),
+    
 
 
 
     # Employee
-    path("employee/home/", employee_views.employee_home, name='employee_home'),
-    path("employee/view/attendance/", employee_views.employee_view_attendance,
+     path("employee/home/", employee_views.employee_home, name='employee_home'),
+     path("employee/view/attendance/", employee_views.employee_view_attendance,
          name='employee_view_attendance'),
-    path("employee/apply/leave/", employee_views.employee_apply_leave,
-         name='employee_apply_leave'),
-    path("employee/feedback/", employee_views.employee_feedback,
-         name='employee_feedback'),
-    path("employee/view/profile/", employee_views.employee_view_profile,
-         name='employee_view_profile'),
-    path("employee/fcmtoken/", employee_views.employee_fcmtoken,
-         name='employee_fcmtoken'),
-    path("employee/view/notification/", employee_views.employee_view_notification,
+     path("employee/apply/leave/", employee_views.employee_apply_leave,
+          name='employee_apply_leave'),
+     path("employee/feedback/", employee_views.employee_feedback,
+          name='employee_feedback'),
+     path("employee/view/profile/", employee_views.employee_view_profile,
+          name='employee_view_profile'),
+     path("employee/fcmtoken/", employee_views.employee_fcmtoken,
+          name='employee_fcmtoken'),
+     path("employee/view/notification/", employee_views.employee_view_notification,
          name="employee_view_notification"),
-    path('employee/view/salary/', employee_views.employee_view_salary,
-         name='employee_view_salary'),
+    
 
 ]

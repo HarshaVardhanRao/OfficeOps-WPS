@@ -67,7 +67,6 @@ class Standard(models.Model):
 
 
 class Manager(models.Model):
-    standard = models.ForeignKey(Standard, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -86,8 +85,6 @@ class Section(models.Model):
 
 class Employee(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    standard = models.ForeignKey(Standard, on_delete=models.DO_NOTHING, null=True, blank=False)
-    section = models.ForeignKey(Section, on_delete=models.DO_NOTHING, null=True, blank=False)
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
@@ -107,6 +104,23 @@ class AttendanceReport(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+class StudentProfile(models.Model):
+    student = models.CharField(max_length=120)
+    standard = models.ForeignKey(Standard, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    dob = models.DateField()
+    address = models.TextField()
+    aadhar = models.TextField()
+
+    def __str__(self):
+        return self.student
+
+class AttendanceReportStudent(models.Model):  # New model for student attendance
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    attendance = models.ForeignKey(Attendance, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)  # Present or Absent
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 class LeaveReportEmployee(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
@@ -156,15 +170,6 @@ class NotificationEmployee(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class EmployeeSalary(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    base = models.FloatField(default=0)
-    ctc = models.FloatField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
@@ -184,3 +189,5 @@ def save_user_profile(sender, instance, **kwargs):
         instance.manager.save()
     if instance.user_type == 3:
         instance.employee.save()
+
+
