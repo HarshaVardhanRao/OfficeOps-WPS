@@ -19,18 +19,23 @@
                             <!-- Section Selection -->
                             <div class="form-group">
                                 <label>Section</label>
-                                <select name="Section" class="form-control" id='Section'>
-                                    <option value="">----</option>
-                                    {% for Section in Sections %}
-                                    <option value="{{ Section.id }}">{{ Section.standard.name }} - {{ Section.name }}</option>
+                                <select name="section" class="form-control" id='section_select'>
+                                    <option value="">-- Select Section --</option>
+                                    {% for section in Sections %}
+                                    <option value="{{ section.id }}">{{ section.standard.name }} - {{ section.name }}</option>
                                     {% endfor %}
                                 </select>
+                            </div>
+
+                            <!-- Date Selection -->
+                            <div class="form-group">
+                                <label>Attendance Date</label>
+                                <input type="date" class="form-control" name="attendance_date" id="attendance_date">
                             </div>
                         </form>
                     </div>
 
                     <div class="card-footer">
-                        <!-- Fetch Students Button -->
                         <button type="button" id='fetch_students' class="btn btn-primary btn-block">Fetch Students</button>
                         <div class="form-group" id="student_data"></div>
                     </div>
@@ -49,12 +54,17 @@
     }
 
     $(document).ready(function () {
+        // Set default date to today
+        var today = new Date().toISOString().split('T')[0];
+        $("#attendance_date").val(today);
+
         $("#fetch_students").click(function () {
-            var sectionId = $("#Section").val();
-            $("#student_data").html(null);
+            var sectionId = $("#section_select").val();
+            var attendance_date = $("#attendance_date").val();
+            $("#student_data").html("");  // Clear previous data
             
             if (!sectionId) {
-                alert("Please select a Section");
+                alert("Please select a section");
                 return false;
             }
 
@@ -74,8 +84,7 @@
                     var div_data = `
                         <hr/>
                         <div class='form-group'>
-                            <label>Attendance Date</label>
-                            <input type='date' class='form-control' name='attendance_date' id='attendance_date'>
+                            <label>Mark Attendance</label>
                             <div class='row'>
                     `;
 
@@ -107,7 +116,7 @@
 
         // Save Attendance
         $(document).on('click', '#save_attendance', function () {
-            var sectionId = $("#Section").val();  // Get section again
+            var sectionId = $("#section_select").val();  // Get section again
             var attendance_date = $('#attendance_date').val();
 
             if (!attendance_date) {
@@ -127,7 +136,7 @@
                 headers: { "X-CSRFToken": getCSRFToken() },
                 data: JSON.stringify({
                     section_id: sectionId,
-                    date: attendance_date,  // Correct variable
+                    date: attendance_date,
                     student_ids: student_data
                 }),
                 contentType: "application/json",

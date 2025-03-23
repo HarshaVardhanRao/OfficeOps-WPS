@@ -44,6 +44,7 @@ def manager_home(request):
 def manager_take_attendance(request):
     manager = get_object_or_404(Manager, admin=request.user)
     Sections = Section.objects.all()
+    print(Sections)
     context = {
         'Sections': Sections,
         'page_title': 'Take Attendance'
@@ -63,7 +64,6 @@ def get_students(request):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-
 @csrf_exempt
 def save_student_attendance(request):
     if request.method == "POST":
@@ -76,6 +76,7 @@ def save_student_attendance(request):
             if not attendance_date or not section_id or not student_ids:
                 return JsonResponse({"error": "Missing required fields"}, status=400)
 
+            # Get or create an Attendance entry for the section & date
             attendance_entry, created = Attendance.objects.get_or_create(
                 section_id=section_id, date=attendance_date
             )
@@ -85,10 +86,14 @@ def save_student_attendance(request):
                 status = student.get("status")
 
                 if student_id is not None:
-                    # Save student attendance (this depends on your model structure)
-                    print(f"Marking Student ID {student_id} as {'Present' if status else 'Absent'}")
+                    # Save attendance record for the student
+                    AttendanceReportStudent.objects.update_or_create(
+                        attendance=attendance_entry,
+                        student_id=student_id,
+                        defaults={"status": status}  # 1 = Present, 0 = Absent
+                    )
 
-            return JsonResponse("OK", safe=False)
+            return JsonResponse({"message": "Attendance saved successfully!"}, status=200)
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON format"}, status=400)
