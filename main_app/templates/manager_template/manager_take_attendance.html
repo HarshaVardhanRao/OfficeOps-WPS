@@ -53,7 +53,7 @@
             var sectionId = $("#Section").val();
             $("#student_data").html(null);
             
-            if (sectionId.length == 0) {
+            if (!sectionId) {
                 alert("Please select a Section");
                 return false;
             }
@@ -67,60 +67,79 @@
                 data: {
                     section_id: sectionId
                 }
-            }).done(function (json_data) {  // No JSON.parse() needed
+            }).done(function (json_data) {
                 if (json_data.length < 1) {
                     alert("No students found in this section");
                 } else {
-                    var div_data = "<hr/><div class='form-group'><label>Attendance Date</label><input type='date' class='form-control' name='attendance_date' id='attendance_date' ><div class='row'>";
+                    var div_data = `
+                        <hr/>
+                        <div class='form-group'>
+                            <label>Attendance Date</label>
+                            <input type='date' class='form-control' name='attendance_date' id='attendance_date'>
+                            <div class='row'>
+                    `;
 
-                    for (key in json_data) {
-                        div_data += "<div class='col-lg-3'><div class='form-check custom-control custom-checkbox'><input type='checkbox' class='custom-control-input' checked='checked' name='student_data[]' value=" + json_data[key]['id'] + " id='checkbox" + json_data[key]['id'] + "' /> <label for='checkbox" + json_data[key]['id'] + "' class='custom-control-label'>" + json_data[key]['student'] + "</label></div> </div>";
-                    }
-                    div_data += "</div></div>";
-                    div_data += "<div class='form-group'><button id='save_attendance' class='btn btn-success' type='button'>Save Attendance</button></div>";
+                    json_data.forEach(student => {
+                        div_data += `
+                            <div class='col-lg-3'>
+                                <div class='form-check custom-control custom-checkbox'>
+                                    <input type='checkbox' class='custom-control-input' checked='checked' name='student_data[]' value="${student.id}" id='checkbox${student.id}'>
+                                    <label for='checkbox${student.id}' class='custom-control-label'>${student.student}</label>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    div_data += `
+                            </div>
+                        </div>
+                        <div class='form-group'>
+                            <button id='save_attendance' class='btn btn-success' type='button'>Save Attendance</button>
+                        </div>
+                    `;
+
                     $("#student_data").html(div_data);
                 }
             }).fail(function (jqXHR, textStatus, errorThrown) {
                 alert("Error: " + textStatus + " - " + errorThrown);
             });
+        });
 
-            // Save Attendance
-            $(document).on('click', '#save_attendance', function () {
-                $(this).attr("disabled", "disabled");
-                $(this).text("Saving Attendance Data...");
-                var student_data = $("input[name='student_data[]']").map(function () {
-                    return { 'id': $(this).val(), 'status': $(this).is(":checked") ? 1 : 0 };
-                }).get();
-                
-                var attendance_date = $('#attendance_date').val();
-                if (attendance_date.length < 10) {
-                    alert("Select a valid date");
-                    return false;
-                }
-                
-                $.ajax({
-                    url: "{% url 'save_student_attendance' %}",
-                    type: 'POST',
-                    headers: {
-                        "X-CSRFToken": getCSRFToken()
-                    },
-                    data: JSON.stringify({
-                        date: attendance_date,
-                        student_ids: student_data,
-                        section_id: sectionId
-                    }),
-                    contentType: "application/json",
-                }).done(function (response) {
-                    if (response == 'OK') {
-                        alert("Attendance saved successfully");
-                    } else {
-                        alert("Error. Please try again");
-                    }
+        // Save Attendance
+        $(document).on('click', '#save_attendance', function () {
+            var sectionId = $("#Section").val();  // Get section again
+            var attendance_date = $('#attendance_date').val();
+
+            if (!attendance_date) {
+                alert("Select a valid date");
+                return false;
+            }
+
+            var student_data = $("input[name='student_data[]']").map(function () {
+                return { 'id': $(this).val(), 'status': $(this).is(":checked") ? 1 : 0 };
+            }).get();
+
+            $(this).attr("disabled", true).text("Saving Attendance...");
+
+            $.ajax({
+                type: "POST",
+                url: "{% url 'save_student_attendance' %}",
+                headers: { "X-CSRFToken": getCSRFToken() },
+                data: JSON.stringify({
+                    section_id: sectionId,
+                    date: attendance_date,  // Correct variable
+                    student_ids: student_data
+                }),
+                contentType: "application/json",
+                success: function(response) {
+                    console.log("✅ Response:", response);
+                    alert(response.message || "Attendance saved successfully!");
                     location.reload();
-                }).fail(function (jqXHR, textStatus, errorThrown) {
-                    alert("Error: " + textStatus + " - " + errorThrown);
-                });
-
+                },
+                error: function(xhr) {
+                    console.log("❌ AJAX Error:", xhr.responseText);
+                    alert("Error saving attendance.");
+                }
             });
         });
     });

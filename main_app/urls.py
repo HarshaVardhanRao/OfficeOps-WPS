@@ -97,7 +97,8 @@ urlpatterns = [
          name="manager_view_notification"),
     path('manager/get_students/', manager_views.get_students, name='get_students'),
     path('manager/save_student_attendance/', manager_views.save_student_attendance, name='save_student_attendance'),
-    
+    path('manager/get_attendance_dates/', manager_views.get_attendance_dates, name='get_attendance_dates'),
+    path('manager/get_attendance_report/', manager_views.get_attendance_report, name='get_attendance_report'),
 
 
 
