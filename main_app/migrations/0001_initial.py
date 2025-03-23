@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Department',
+            name='Section',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120)),
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Division',
+            name='Standard',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=120)),
@@ -80,8 +80,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('admin', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('department', models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.department')),
-                ('division', models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.division')),
+                ('Section', models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.Section')),
+                ('Standard', models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.Standard')),
             ],
         ),
         migrations.CreateModel(
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('admin', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('division', models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.division')),
+                ('Standard', models.ForeignKey(null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.Standard')),
             ],
         ),
         migrations.CreateModel(
@@ -166,14 +166,14 @@ class Migration(migrations.Migration):
                 ('ctc', models.FloatField(default=0)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('department', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main_app.department')),
+                ('Section', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main_app.Section')),
                 ('employee', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main_app.employee')),
             ],
         ),
         migrations.AddField(
-            model_name='department',
-            name='division',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main_app.division'),
+            model_name='Section',
+            name='Standard',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='main_app.Standard'),
         ),
         migrations.CreateModel(
             name='AttendanceReport',
@@ -188,8 +188,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='attendance',
-            name='department',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.department'),
+            name='Section',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, to='main_app.Section'),
         ),
         migrations.CreateModel(
             name='Admin',

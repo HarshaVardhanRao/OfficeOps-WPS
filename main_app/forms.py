@@ -62,7 +62,7 @@ class EmployeeForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Employee
         fields = CustomUserForm.Meta.fields + \
-            ['division', 'department']
+            ['standard', 'section']
 
 
 class AdminForm(CustomUserForm):
@@ -81,26 +81,26 @@ class ManagerForm(CustomUserForm):
     class Meta(CustomUserForm.Meta):
         model = Manager
         fields = CustomUserForm.Meta.fields + \
-            ['division' ]
+            ['standard' ]
 
 
-class DivisionForm(FormSettings):
+class StandardForm(FormSettings):
     def __init__(self, *args, **kwargs):
-        super(DivisionForm, self).__init__(*args, **kwargs)
+        super(StandardForm, self).__init__(*args, **kwargs)
 
     class Meta:
         fields = ['name']
-        model = Division
+        model = Standard
 
 
-class DepartmentForm(FormSettings):
+class SectionForm(FormSettings):
 
     def __init__(self, *args, **kwargs):
-        super(DepartmentForm, self).__init__(*args, **kwargs)
+        super(SectionForm, self).__init__(*args, **kwargs)
 
     class Meta:
-        model = Department
-        fields = ['name', 'division']
+        model = Section
+        fields = ['name', 'standard']
 
 
 class LeaveReportManagerForm(FormSettings):
@@ -171,4 +171,4 @@ class EditSalaryForm(FormSettings):
 
     class Meta:
         model = EmployeeSalary
-        fields = ['department', 'employee', 'base', 'ctc']
+        fields = ['section', 'employee', 'base', 'ctc']

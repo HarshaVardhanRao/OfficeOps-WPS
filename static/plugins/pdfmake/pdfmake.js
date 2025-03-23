@@ -18476,7 +18476,7 @@ var isString = __webpack_require__(0).isString;
 
 /**
  * Creates an instance of DocumentContext - a store for current x, y positions and available width/height.
- * It facilitates column divisions and vertical sync
+ * It facilitates column Standards and vertical sync
  */
 function DocumentContext(pageSize, pageMargins) {
 	this.pages = [];
@@ -62561,7 +62561,7 @@ var encode = function (ver, mode, data, maxbuflen) {
 // calculates ECC code words for given code words and generator polynomial.
 //
 // this is quite similar to CRC calculation as both Reed-Solomon and CRC use
-// the certain kind of cyclic codes, which is effectively the division of
+// the certain kind of cyclic codes, which is effectively the Standard of
 // zero-augumented polynomial by the generator polynomial. the only difference
 // is that Reed-Solomon uses GF(2^8), instead of CRC's GF(2), and Reed-Solomon
 // uses the different generator polynomial than CRC's.
@@ -66167,22 +66167,22 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
   };
 
   var BezierSegment = function BezierSegment(p1x, p1y, c1x, c1y, c2x, c2y, p2x, p2y) {
-    var divisions = 6 * precision;
+    var Standards = 6 * precision;
     var equationX = [p1x, -3 * p1x + 3 * c1x, 3 * p1x - 6 * c1x + 3 * c2x, -p1x + 3 * c1x - 3 * c2x + p2x];
     var equationY = [p1y, -3 * p1y + 3 * c1y, 3 * p1y - 6 * c1y + 3 * c2y, -p1y + 3 * c1y - 3 * c2y + p2y];
     var derivativeX = [-3 * p1x + 3 * c1x, 6 * p1x - 12 * c1x + 6 * c2x, -3 * p1x + 9 * c1x - 9 * c2x + 3 * p2x];
     var derivativeY = [-3 * p1y + 3 * c1y, 6 * p1y - 12 * c1y + 6 * c2y, -3 * p1y + 9 * c1y - 9 * c2y + 3 * p2y];
     var lengthMap = [0];
 
-    for (var i = 1; i <= divisions; i++) {
-      var t = (i - 0.5) / divisions;
-      var dx = getCurveValue(t, derivativeX) / divisions,
-          dy = getCurveValue(t, derivativeY) / divisions,
+    for (var i = 1; i <= Standards; i++) {
+      var t = (i - 0.5) / Standards;
+      var dx = getCurveValue(t, derivativeX) / Standards,
+          dy = getCurveValue(t, derivativeY) / Standards,
           l = Math.sqrt(dx * dx + dy * dy);
       lengthMap[i] = lengthMap[i - 1] + l;
     }
 
-    this.totalLength = lengthMap[divisions];
+    this.totalLength = lengthMap[Standards];
     this.startPoint = [p1x, p1y, isEqual(p1x, c1x) && isEqual(p1y, c1y) ? Math.atan2(c2y - c1y, c2x - c1x) : Math.atan2(c1y - p1y, c1x - p1x)];
     this.endPoint = [p2x, p2y, isEqual(c2x, p2x) && isEqual(c2y, p2y) ? Math.atan2(c2y - c1y, c2x - c1x) : Math.atan2(p2y - c2y, p2x - c2x)];
 
@@ -66253,12 +66253,12 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
         return;
       }
 
-      for (var _i6 = 1; _i6 <= divisions; _i6++) {
+      for (var _i6 = 1; _i6 <= Standards; _i6++) {
         var l1 = lengthMap[_i6 - 1],
             l2 = lengthMap[_i6];
 
         if (l1 <= l && l <= l2) {
-          var _t = (_i6 - (l2 - l) / (l2 - l1)) / divisions,
+          var _t = (_i6 - (l2 - l) / (l2 - l1)) / Standards,
               _x2 = getCurveValue(_t, equationX),
               _y2 = getCurveValue(_t, equationY),
               _dx = getCurveValue(_t, derivativeX),

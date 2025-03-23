@@ -19,7 +19,7 @@
        <table class="table table-bordered">
            <tr>
                <th>ID</th>
-               <th>Department</th>
+               <th>Section</th>
                <th>Base Salary</th>
                <th>CTC</th>
                <th>Total</th>
@@ -27,7 +27,7 @@
         {% for salary in salarys %}
         <tr>
             <td>{{forloop.counter}}</td>
-            <td>{{ salary.department }}</td>
+            <td>{{ salary.Section }}</td>
             <td>{{ salary.base }}</td>
             <td>{{ salary.ctc }}</td>
             <td>{{ salary.base|add:salary.ctc }}</td>

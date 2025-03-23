@@ -7221,7 +7221,7 @@ function Datepicker() {
 	this._disabledInputs = []; // List of date picker inputs that have been disabled
 	this._datepickerShowing = false; // True if the popup picker is showing , false if not
 	this._inDialog = false; // True if showing within a "dialog", false if not
-	this._mainDivId = "ui-datepicker-div"; // The ID of the main datepicker division
+	this._mainDivId = "ui-datepicker-div"; // The ID of the main datepicker Standard
 	this._inlineClass = "ui-datepicker-inline"; // The name of the inline marker class
 	this._appendClass = "ui-datepicker-append"; // The name of the append marker class
 	this._triggerClass = "ui-datepicker-trigger"; // The name of the trigger marker class
@@ -7327,7 +7327,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Attach the date picker to a jQuery selection.
-	 * @param  target	element - the target input field or division or span
+	 * @param  target	element - the target input field or Standard or span
 	 * @param  settings  object - the new settings to use for this date picker instance (anonymous)
 	 */
 	_attachDatepicker: function( target, settings ) {
@@ -7529,7 +7529,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Detach a datepicker from its control.
-	 * @param  target	element - the target input field or division or span
+	 * @param  target	element - the target input field or Standard or span
 	 */
 	_destroyDatepicker: function( target ) {
 		var nodeName,
@@ -7560,7 +7560,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Enable the date picker to a jQuery selection.
-	 * @param  target	element - the target input field or division or span
+	 * @param  target	element - the target input field or Standard or span
 	 */
 	_enableDatepicker: function( target ) {
 		var nodeName, inline,
@@ -7588,7 +7588,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Disable the date picker to a jQuery selection.
-	 * @param  target	element - the target input field or division or span
+	 * @param  target	element - the target input field or Standard or span
 	 */
 	_disableDatepicker: function( target ) {
 		var nodeName, inline,
@@ -7617,7 +7617,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Is the first field in a jQuery collection disabled as a datepicker?
-	 * @param  target	element - the target input field or division or span
+	 * @param  target	element - the target input field or Standard or span
 	 * @return boolean - true if disabled, false if enabled
 	 */
 	_isDisabledDatepicker: function( target ) {
@@ -7633,7 +7633,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Retrieve the instance data for the target control.
-	 * @param  target  element - the target input field or division or span
+	 * @param  target  element - the target input field or Standard or span
 	 * @return  object - the associated instance data
 	 * @throws  error if a jQuery problem getting data
 	 */
@@ -7646,8 +7646,8 @@ $.extend( Datepicker.prototype, {
 		}
 	},
 
-	/* Update or retrieve the settings for a date picker attached to an input field or division.
-	 * @param  target  element - the target input field or division or span
+	/* Update or retrieve the settings for a date picker attached to an input field or Standard.
+	 * @param  target  element - the target input field or Standard or span
 	 * @param  name	object - the new settings to update or
 	 *				string - the name of the setting to change or retrieve,
 	 *				when retrieving also "all" for all instance settings or
@@ -7708,8 +7708,8 @@ $.extend( Datepicker.prototype, {
 		this._optionDatepicker( target, name, value );
 	},
 
-	/* Redraw the date picker attached to an input field or division.
-	 * @param  target  element - the target input field or division or span
+	/* Redraw the date picker attached to an input field or Standard.
+	 * @param  target  element - the target input field or Standard or span
 	 */
 	_refreshDatepicker: function( target ) {
 		var inst = this._getInst( target );
@@ -7719,7 +7719,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Set the dates for a jQuery selection.
-	 * @param  target element - the target input field or division or span
+	 * @param  target element - the target input field or Standard or span
 	 * @param  date	Date - the new date
 	 */
 	_setDateDatepicker: function( target, date ) {
@@ -7732,7 +7732,7 @@ $.extend( Datepicker.prototype, {
 	},
 
 	/* Get the date(s) for the first entry in a jQuery selection.
-	 * @param  target element - the target input field or division or span
+	 * @param  target element - the target input field or Standard or span
 	 * @param  noDefault boolean - true if no default date is to be used
 	 * @return Date - the current date
 	 */

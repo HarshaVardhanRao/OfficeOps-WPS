@@ -55,9 +55,9 @@
                 <!-- small box -->
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h3>{{total_department}}</h3>
+                        <h3>{{total_Section}}</h3>
 
-                        <p>Total Department</p>
+                        <p>Total Section</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-pie-graph"></i>
@@ -120,7 +120,7 @@
 $(document).ready(function(){
 
     //Dataset
-    var departments = {{data_name|safe}}
+    var Sections = {{data_name|safe}}
     var data_present = {{data_present}}
     var data_absent = {{data_absent}}
 
@@ -151,7 +151,7 @@ $(document).ready(function(){
     //attendanceStatistics
 //Bar Chart
 var areaChartData = {
-    labels  : departments,
+    labels  : Sections,
     datasets: [
     {
         label               : 'Present In Class',

@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.contrib import messages
-from .models import Department, Manager, Employee, EmployeeSalary
+from .models import Section, Manager, Employee, EmployeeSalary
 from .forms import EditSalaryForm
 from django.urls import reverse
 
@@ -10,7 +10,7 @@ class EditSalaryView(View):
     def get(self, request, *args, **kwargs):
         salaryForm = EditSalaryForm()
         manager = get_object_or_404(Manager, admin=request.user)
-        salaryForm.fields['department'].queryset = Department.objects.filter(division=manager.division)
+        salaryForm.fields['Section'].queryset = Section.objects.filter(Standard=manager.Standard)
         context = {
             'form': salaryForm,
             'page_title': "Edit Employee's Salary"
@@ -23,11 +23,11 @@ class EditSalaryView(View):
         if form.is_valid():
             try:
                 employee = form.cleaned_data.get('employee')
-                department = form.cleaned_data.get('department')
+                Section = form.cleaned_data.get('Section')
                 base = form.cleaned_data.get('base')
                 ctc = form.cleaned_data.get('ctc')
                 # Validating
-                salary = EmployeeSalary.objects.get(employee=employee, department=department)
+                salary = EmployeeSalary.objects.get(employee=employee, Section=Section)
                 salary.ctc = ctc
                 salary.base = base
                 salary.save()

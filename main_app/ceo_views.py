@@ -12,29 +12,30 @@ from django.views.generic import UpdateView
 
 from .forms import *
 from .models import *
+from .models import Section
 
 
 def admin_home(request):
     total_manager = Manager.objects.all().count()
     total_employees = Employee.objects.all().count()
-    departments = Department.objects.all()
-    total_department = departments.count()
-    total_division = Division.objects.all().count()
-    attendance_list = Attendance.objects.filter(department__in=departments)
+    Sections = Section.objects.all()
+    total_Section = Sections.count()
+    total_Standard = Standard.objects.all().count()
+    attendance_list = Attendance.objects.filter(section__in=Sections)
     total_attendance = attendance_list.count()
     attendance_list = []
-    department_list = []
-    for department in departments:
-        attendance_count = Attendance.objects.filter(department=department).count()
-        department_list.append(department.name[:7])
+    Section_list = []
+    for section in Sections:
+        attendance_count = Attendance.objects.filter(section=section).count()
+        Section_list.append(section.name[:7])
         attendance_list.append(attendance_count)
     context = {
         'page_title': "Administrative Dashboard",
         'total_employees': total_employees,
         'total_manager': total_manager,
-        'total_division': total_division,
-        'total_department': total_department,
-        'department_list': department_list,
+        'total_Standard': total_Standard,
+        'total_Section': total_Section,
+        'Section_list': Section_list,
         'attendance_list': attendance_list
 
     }
@@ -52,7 +53,7 @@ def add_manager(request):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password')
-            division = form.cleaned_data.get('division')
+            Standard = form.cleaned_data.get('Standard')
             passport = request.FILES.get('profile_pic')
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -62,7 +63,7 @@ def add_manager(request):
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.manager.division = division
+                user.manager.Standard = Standard
                 user.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_manager'))
@@ -86,8 +87,8 @@ def add_employee(request):
             email = employee_form.cleaned_data.get('email')
             gender = employee_form.cleaned_data.get('gender')
             password = employee_form.cleaned_data.get('password')
-            division = employee_form.cleaned_data.get('division')
-            department = employee_form.cleaned_data.get('department')
+            Standard = employee_form.cleaned_data.get('Standard')
+            Section = employee_form.cleaned_data.get('Section')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -97,8 +98,8 @@ def add_employee(request):
                     email=email, password=password, user_type=3, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.employee.division = division
-                user.employee.department = department
+                user.employee.Standard = Standard
+                user.employee.Section = Section
                 user.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_employee'))
@@ -109,52 +110,52 @@ def add_employee(request):
     return render(request, 'ceo_template/add_employee_template.html', context)
 
 
-def add_division(request):
-    form = DivisionForm(request.POST or None)
+def add_Standard(request):
+    form = StandardForm(request.POST or None)
     context = {
         'form': form,
-        'page_title': 'Add Division'
+        'page_title': 'Add Standard'
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
             try:
-                division = Division()
-                division.name = name
-                division.save()
+                Standard = Standard()
+                Standard.name = name
+                Standard.save()
                 messages.success(request, "Successfully Added")
-                return redirect(reverse('add_division'))
+                return redirect(reverse('add_Standard'))
             except:
                 messages.error(request, "Could Not Add")
         else:
             messages.error(request, "Could Not Add")
-    return render(request, 'ceo_template/add_division_template.html', context)
+    return render(request, 'ceo_template/add_Standard_template.html', context)
 
 
-def add_department(request):
-    form = DepartmentForm(request.POST or None)
+def add_Section(request):
+    form = SectionForm(request.POST or None)
     context = {
         'form': form,
-        'page_title': 'Add Department'
+        'page_title': 'Add Section'
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            division = form.cleaned_data.get('division')
+            Standard = form.cleaned_data.get('Standard')
             try:
-                department = Department()
-                department.name = name
-                department.division = division
-                department.save()
+                Section = Section()
+                Section.name = name
+                Section.Standard = Standard
+                Section.save()
                 messages.success(request, "Successfully Added")
-                return redirect(reverse('add_department'))
+                return redirect(reverse('add_Section'))
 
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
 
-    return render(request, 'ceo_template/add_department_template.html', context)
+    return render(request, 'ceo_template/add_Section_template.html', context)
 
 
 def manage_manager(request):
@@ -175,22 +176,22 @@ def manage_employee(request):
     return render(request, "ceo_template/manage_employee.html", context)
 
 
-def manage_division(request):
-    divisions = Division.objects.all()
+def manage_Standard(request):
+    Standards = Standard.objects.all()
     context = {
-        'divisions': divisions,
-        'page_title': 'Manage Divisions'
+        'Standards': Standards,
+        'page_title': 'Manage Standards'
     }
-    return render(request, "ceo_template/manage_division.html", context)
+    return render(request, "ceo_template/manage_Standard.html", context)
 
 
-def manage_department(request):
-    departments = Department.objects.all()
+def manage_Section(request):
+    Sections = Section.objects.all()
     context = {
-        'departments': departments,
-        'page_title': 'Manage Departments'
+        'Sections': Sections,
+        'page_title': 'Manage Sections'
     }
-    return render(request, "ceo_template/manage_department.html", context)
+    return render(request, "ceo_template/manage_Section.html", context)
 
 
 def edit_manager(request, manager_id):
@@ -210,7 +211,7 @@ def edit_manager(request, manager_id):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
-            division = form.cleaned_data.get('division')
+            Standard = form.cleaned_data.get('Standard')
             passport = request.FILES.get('profile_pic') or None
             try:
                 user = CustomUser.objects.get(id=manager.admin.id)
@@ -227,7 +228,7 @@ def edit_manager(request, manager_id):
                 user.last_name = last_name
                 user.gender = gender
                 user.address = address
-                manager.division = division
+                manager.Standard = Standard
                 user.save()
                 manager.save()
                 messages.success(request, "Successfully Updated")
@@ -259,8 +260,8 @@ def edit_employee(request, employee_id):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
-            division = form.cleaned_data.get('division')
-            department = form.cleaned_data.get('department')
+            Standard = form.cleaned_data.get('Standard')
+            Section = form.cleaned_data.get('Section')
             passport = request.FILES.get('profile_pic') or None
             try:
                 user = CustomUser.objects.get(id=employee.admin.id)
@@ -277,8 +278,8 @@ def edit_employee(request, employee_id):
                 user.last_name = last_name
                 user.gender = gender
                 user.address = address
-                employee.division = division
-                employee.department = department
+                employee.Standard = Standard
+                employee.Section = Section
                 user.save()
                 employee.save()
                 messages.success(request, "Successfully Updated")
@@ -291,54 +292,54 @@ def edit_employee(request, employee_id):
         return render(request, "ceo_template/edit_employee_template.html", context)
 
 
-def edit_division(request, division_id):
-    instance = get_object_or_404(Division, id=division_id)
-    form = DivisionForm(request.POST or None, instance=instance)
+def edit_Standard(request, Standard_id):
+    instance = get_object_or_404(Standard, id=Standard_id)
+    form = StandardForm(request.POST or None, instance=instance)
     context = {
         'form': form,
-        'division_id': division_id,
-        'page_title': 'Edit Division'
+        'Standard_id': Standard_id,
+        'page_title': 'Edit Standard'
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
             try:
-                division = Division.objects.get(id=division_id)
-                division.name = name
-                division.save()
+                Standard = Standard.objects.get(id=Standard_id)
+                Standard.name = name
+                Standard.save()
                 messages.success(request, "Successfully Updated")
             except:
                 messages.error(request, "Could Not Update")
         else:
             messages.error(request, "Could Not Update")
 
-    return render(request, 'ceo_template/edit_division_template.html', context)
+    return render(request, 'ceo_template/edit_Standard_template.html', context)
 
 
-def edit_department(request, department_id):
-    instance = get_object_or_404(Department, id=department_id)
-    form = DepartmentForm(request.POST or None, instance=instance)
+def edit_Section(request, Section_id):
+    instance = get_object_or_404(Section, id=Section_id)
+    form = SectionForm(request.POST or None, instance=instance)
     context = {
         'form': form,
-        'department_id': department_id,
-        'page_title': 'Edit Department'
+        'Section_id': Section_id,
+        'page_title': 'Edit Section'
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            division = form.cleaned_data.get('division')
+            Standard = form.cleaned_data.get('Standard')
             try:
-                department = Department.objects.get(id=department_id)
-                department.name = name
-                department.division = division
-                department.save()
+                Section = Section.objects.get(id=Section_id)
+                Section.name = name
+                Section.Standard = Standard
+                Section.save()
                 messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_department', args=[department_id]))
+                return redirect(reverse('edit_Section', args=[Section_id]))
             except Exception as e:
                 messages.error(request, "Could Not Add " + str(e))
         else:
             messages.error(request, "Fill Form Properly")
-    return render(request, 'ceo_template/edit_department_template.html', context)
+    return render(request, 'ceo_template/edit_Section_template.html', context)
 
 
 @csrf_exempt
@@ -446,9 +447,9 @@ def view_employee_leave(request):
 
 
 def admin_view_attendance(request):
-    departments = Department.objects.all()
+    Sections = Section.objects.all()
     context = {
-        'departments': departments,
+        'Sections': Sections,
         'page_title': 'View Attendance'
     }
 
@@ -457,10 +458,10 @@ def admin_view_attendance(request):
 
 @csrf_exempt
 def get_admin_attendance(request):
-    department_id = request.POST.get('department')
+    Section_id = request.POST.get('Section')
     attendance_date_id = request.POST.get('attendance_date_id')
     try:
-        department = get_object_or_404(Department, id=department_id)
+        Section = get_object_or_404(Section, id=Section_id)
         attendance = get_object_or_404(Attendance, id=attendance_date_id)
         attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
         json_data = []
@@ -537,7 +538,7 @@ def send_employee_notification(request):
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
-                'title': "OfficeOps",
+                'title': "GreenValleyMS",
                 'body': message,
                 'click_action': reverse('employee_view_notification'),
                 'icon': static('dist/img/AdminLTELogo.png')
@@ -564,7 +565,7 @@ def send_manager_notification(request):
         url = "https://fcm.googleapis.com/fcm/send"
         body = {
             'notification': {
-                'title': "OfficeOps",
+                'title': "GreenValleyMS",
                 'body': message,
                 'click_action': reverse('manager_view_notification'),
                 'icon': static('dist/img/AdminLTELogo.png')
@@ -596,19 +597,19 @@ def delete_employee(request, employee_id):
     return redirect(reverse('manage_employee'))
 
 
-def delete_division(request, division_id):
-    division = get_object_or_404(Division, id=division_id)
+def delete_Standard(request, Standard_id):
+    Standard = get_object_or_404(Standard, id=Standard_id)
     try:
-        division.delete()
-        messages.success(request, "Division deleted successfully!")
+        Standard.delete()
+        messages.success(request, "Standard deleted successfully!")
     except Exception:
         messages.error(
-            request, "Sorry, some employees are assigned to this division already. Kindly change the affected employee division and try again")
-    return redirect(reverse('manage_division'))
+            request, "Sorry, some employees are assigned to this Standard already. Kindly change the affected employee Standard and try again")
+    return redirect(reverse('manage_Standard'))
 
 
-def delete_department(request, department_id):
-    department = get_object_or_404(Department, id=department_id)
-    department.delete()
-    messages.success(request, "Department deleted successfully!")
-    return redirect(reverse('manage_department'))
+def delete_Section(request, Section_id):
+    Section = get_object_or_404(Section, id=Section_id)
+    Section.delete()
+    messages.success(request, "Section deleted successfully!")
+    return redirect(reverse('manage_Section'))

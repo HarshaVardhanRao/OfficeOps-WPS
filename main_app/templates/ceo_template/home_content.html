@@ -41,14 +41,14 @@
                 <!-- small box -->
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h3>{{total_division}}</h3>
+                        <h3>{{total_Standard}}</h3>
 
-                        <p>Total Division</p>
+                        <p>Total Standard</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-person-add"></i>
                     </div>
-                    <a href="{% url 'manage_division' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{% url 'manage_Standard' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             <!-- ./col -->
@@ -56,14 +56,14 @@
                 <!-- small box -->
                 <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>{{total_department}}</h3>
+                        <h3>{{total_Section}}</h3>
 
-                        <p>Total Departments</p>
+                        <p>Total Sections</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-pie-graph"></i>
                     </div>
-                    <a href="{% url 'manage_department' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                    <a href="{% url 'manage_Section' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
                 </div>
             </div>
             <!-- ./col -->
@@ -142,11 +142,11 @@
           options: pieOptions      
         });
 
-        var department_list = {{ department_list|safe|escape }};
+        var Section_list = {{ Section_list|safe|escape }};
         var attendance_list = {{ attendance_list }};
   
             var barChartData = {
-      labels  : department_list,
+      labels  : Section_list,
       datasets: [
       {
         label               : 'Attendance',

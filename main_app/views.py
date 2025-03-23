@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from .EmailBackend import EmailBackend
-from .models import Attendance, Department
+from .models import Attendance, Section
 
 # Create your views here.
 
@@ -27,24 +27,6 @@ def doLogin(request, **kwargs):
     if request.method != 'POST':
         return HttpResponse("<h4>Denied</h4>")
     else:
-        #Google recaptcha
-        captcha_token = request.POST.get('g-recaptcha-response')
-        captcha_url = "https://www.google.com/recaptcha/api/siteverify"
-        captcha_key = "6Lf9RfcnAAAAAIn2o_U8h3KQwb3lVMeDvenBCXYp"
-        data = {
-            'secret': captcha_key,
-            'response': captcha_token
-        }
-        # Make request
-        try:
-            captcha_server = requests.post(url=captcha_url, data=data)
-            response = json.loads(captcha_server.text)
-            if response['success'] == False:
-                messages.error(request, 'Invalid Captcha. Try Again')
-                return redirect('/')
-        except:
-            messages.error(request, 'Captcha could not be verified. Try Again')
-            return redirect('/')
         
         #Authenticate
         user = EmailBackend.authenticate(request, username=request.POST.get('email'), password=request.POST.get('password'))
@@ -70,10 +52,10 @@ def logout_user(request):
 
 @csrf_exempt
 def get_attendance(request):
-    department_id = request.POST.get('department')
+    Section_id = request.POST.get('Section')
     try:
-        department = get_object_or_404(Department, id=department_id)
-        attendance = Attendance.objects.filter(department=department)
+        Section = get_object_or_404(Section, id=Section_id)
+        attendance = Attendance.objects.filter(Section=Section)
         attendance_list = []
         for attd in attendance:
             data = {

@@ -20,11 +20,11 @@
 
 
                         <div class="form-group">
-                            <label>Department</label>
-                            <select name="department" class="form-control" id='department'>
+                            <label>Section</label>
+                            <select name="Section" class="form-control" id='Section'>
                                 <option value="">----</option>
-                                {% for department in departments  %}
-                                <option value="{{department.id}}">{{department.name}}</option>
+                                {% for Section in Sections  %}
+                                <option value="{{Section.id}}">{{Section.name}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -62,17 +62,17 @@
 <script>
     $(document).ready(function () {
         $("#fetch_employee").click(function () {
-            var department = $("#department").val()
+            var Section = $("#Section").val()
             $("#employee_data").html(null)
-            if (department.length == 0) {
-                alert("Please select a department");
+            if (Section.length == 0) {
+                alert("Please select a Section");
                 return false;
             }
             $.ajax({
                 url: "{% url 'get_employees' %}",
                 type: 'POST',
                 data: {
-                    department: department
+                    Section: Section
                 }
             }).done(function (response) {
                 var json_data = JSON.parse(response)
@@ -116,7 +116,7 @@
                     data: {
                         date: attendance_date,
                         employee_ids: employee_data,
-                        department: department
+                        Section: Section
             
                     }
                 }).done(function (response) {

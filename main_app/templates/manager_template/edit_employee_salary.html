@@ -46,7 +46,7 @@
 {% block custom_js %}
 <script>
     $(document).ready(function () {
-        $("#id_department").change(function () {
+        $("#id_Section").change(function () {
             fetchEmployees();
         });
         $("#id_employee").change(function () {
@@ -58,16 +58,16 @@
         $('label[for="id_base"]').hide();
         $('label[for="id_ctc"]').hide();
         function fetchEmployees(){
-            var department = $("#id_department").val();
+            var Section = $("#id_Section").val();
             $("#id_employee").html(null);
-            if (department.length == 0){
+            if (Section.length == 0){
                 return false;
             }
             $.ajax({
                 url: "{% url 'get_employees' %}",
                 type: 'POST',
                 data: {
-                    department: department,
+                    Section: Section,
                 }
             }).done(function (response) {
                 var json_data = JSON.parse(response)
@@ -89,7 +89,7 @@
 
                function fetch_employee_salary(){
                 var employee = $("#id_employee").val()
-                var department = $("#id_department").val()
+                var Section = $("#id_Section").val()
                 $("#id_base").val(null)
                 $("#id_ctc").val(null)
                 $("#id_ctc").hide()
@@ -97,14 +97,14 @@
                 $("#id_base").hide()
                 $('label[for="id_base"]').hide();
                 $('label[for="id_ctc"]').hide();
-                if (employee.length  == 0 || department.length == 0 || employee < 1 || department < 1){
+                if (employee.length  == 0 || Section.length == 0 || employee < 1 || Section < 1){
                     return false;
                 }
                 $.ajax({
                     url: "{% url 'fetch_employee_salary' %}",
                     type: 'POST',
                     data: {
-                        department: department,
+                        Section: Section,
                         employee:employee
                     }
                 }).done(function (response) {

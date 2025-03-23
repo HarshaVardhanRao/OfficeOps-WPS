@@ -2084,7 +2084,7 @@ var modifiers = {
    * The latter is a deprecated method because it leads to confusion and will be
    * removed in v2.<br />
    * Additionally, it accepts additions and subtractions between different units.
-   * Note that multiplications and divisions aren't supported.
+   * Note that multiplications and Standards aren't supported.
    *
    * Valid examples are:
    * ```

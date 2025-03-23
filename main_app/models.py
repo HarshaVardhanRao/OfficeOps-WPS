@@ -57,7 +57,7 @@ class Admin(models.Model):
 
 
 
-class Division(models.Model):
+class Standard(models.Model):
     name = models.CharField(max_length=120)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -67,16 +67,16 @@ class Division(models.Model):
 
 
 class Manager(models.Model):
-    division = models.ForeignKey(Division, on_delete=models.DO_NOTHING, null=True, blank=False)
+    standard = models.ForeignKey(Standard, on_delete=models.DO_NOTHING, null=True, blank=False)
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.admin.last_name + " " + self.admin.first_name
 
 
-class Department(models.Model):
+class Section(models.Model):
     name = models.CharField(max_length=120)
-    division = models.ForeignKey(Division, on_delete=models.CASCADE)
+    standard = models.ForeignKey(Standard, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -86,15 +86,15 @@ class Department(models.Model):
 
 class Employee(models.Model):
     admin = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    division = models.ForeignKey(Division, on_delete=models.DO_NOTHING, null=True, blank=False)
-    department = models.ForeignKey(Department, on_delete=models.DO_NOTHING, null=True, blank=False)
+    standard = models.ForeignKey(Standard, on_delete=models.DO_NOTHING, null=True, blank=False)
+    section = models.ForeignKey(Section, on_delete=models.DO_NOTHING, null=True, blank=False)
 
     def __str__(self):
         return self.admin.last_name + ", " + self.admin.first_name
 
 
 class Attendance(models.Model):
-    department = models.ForeignKey(Department, on_delete=models.DO_NOTHING)
+    section = models.ForeignKey(Section, on_delete=models.DO_NOTHING)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -158,7 +158,7 @@ class NotificationEmployee(models.Model):
 
 class EmployeeSalary(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
     base = models.FloatField(default=0)
     ctc = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

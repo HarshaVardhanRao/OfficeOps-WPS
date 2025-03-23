@@ -44,11 +44,11 @@
 
 
                         <div class="form-group">
-                            <label>Select Department</label>
-                            <select  id="department" class="form-control">
+                            <label>Select Section</label>
+                            <select  id="Section" class="form-control">
                                 <option value="">----</option>
-                                {% for department in departments  %}
-                                <option value="{{department.id}}">{{department.name}} </option>
+                                {% for Section in Sections  %}
+                                <option value="{{Section.id}}">{{Section.name}} </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -92,11 +92,11 @@
 
        
         $("#fetch_attendance").click(function () {
-            var department = $("#department").val()
+            var Section = $("#Section").val()
             var start_date = $("#start_date").val()
             var end_date = $("#end_date").val()
-            if (department.length  == 0 || end_date.length ==0 ||start_date.length == 0){
-                alert("Please Select Department and Date Range");
+            if (Section.length  == 0 || end_date.length ==0 ||start_date.length == 0){
+                alert("Please Select Section and Date Range");
                 return false;
             }
             $("#attendance_data").html(null)
@@ -104,7 +104,7 @@
                 url: "{% url 'employee_view_attendance' %}",
                 type: 'POST',
                 data: {
-                    department: department,
+                    Section: Section,
                     start_date: start_date,
                     end_date:end_date
                 }

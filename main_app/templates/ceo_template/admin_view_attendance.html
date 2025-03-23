@@ -44,11 +44,11 @@
 
 
                         <div class="form-group">
-                            <label>Department</label>
-                            <select name="department" class="form-control" id='department'>
+                            <label>Section</label>
+                            <select name="Section" class="form-control" id='Section'>
                                 <option value="">----</option>
-                                {% for department in departments  %}
-                                <option value="{{department.id}}">{{department.name}}</option>
+                                {% for Section in Sections  %}
+                                <option value="{{Section.id}}">{{Section.name}}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -94,9 +94,9 @@
 <script>
     $(document).ready(function () {
         $("#fetch_attendance").click(function(){
-            var department = $("#department").val()
-            if (department.length < 1){
-                $("#error_attendance").html("Kindly Choose a Department");
+            var Section = $("#Section").val()
+            if (Section.length < 1){
+                $("#error_attendance").html("Kindly Choose a Section");
                 $("#attendance_block").hide()
                 $("#error_attendance").show()
                 return false
@@ -105,7 +105,7 @@
                 url: "{% url 'get_attendance' %}",
                 type: 'POST',
                 data: {
-                    department: department
+                    Section: Section
                 }
             
             }
@@ -145,7 +145,7 @@
 
         $("#fetch_employee").click(function () {
             var attendance_date = $("#attendance_date").val()
-            var department = $("#department").val()
+            var Section = $("#Section").val()
             $("#employee_data").html(null)
 if (attendance_date.length  == 0){
     alert("Please Choose A Date");
@@ -158,7 +158,7 @@ if (attendance_date.length  == 0){
                 type: 'POST',
                 data: {
                     attendance_date_id:attendance_date,
-                    department:department
+                    Section:Section
                 }
             }).done(function (response) {
                 var json_data = JSON.parse(response)

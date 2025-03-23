@@ -91,45 +91,45 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    {% url 'add_division' as add_division %}
-                    <a href="{{add_division}}" class="nav-link  {% if add_division == request.path %} active {% endif %}">
+                    {% url 'add_Standard' as add_Standard %}
+                    <a href="{{add_Standard}}" class="nav-link  {% if add_Standard == request.path %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
-                            Add Division
+                            Add Standard
 
                         </p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    {% url 'manage_division' as manage_division %}
-                    {% url 'edit_division' division_id as edit_division %}
-                    <a href="{{manage_division}}"
-                        class="nav-link  {% if edit_division == request.path or manage_division == request.path %} active {% endif %}">
+                    {% url 'manage_Standard' as manage_Standard %}
+                    {% url 'edit_Standard' Standard_id as edit_Standard %}
+                    <a href="{{manage_Standard}}"
+                        class="nav-link  {% if edit_Standard == request.path or manage_Standard == request.path %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
-                            Manage Division
+                            Manage Standard
 
                         </p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    {% url 'add_department' as add_department %}
-                    <a href="{{add_department}}" class="nav-link  {% if add_department == request.path %} active {% endif %}">
+                    {% url 'add_Section' as add_Section %}
+                    <a href="{{add_Section}}" class="nav-link  {% if add_Section == request.path %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
-                            Add Department
+                            Add Section
 
                         </p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    {% url 'manage_department' as manage_department %}
-                    {% url 'edit_department' department_id as edit_department %}
-                    <a href="{{manage_department}}"
-                        class="nav-link  {% if edit_department == request.path or manage_department == request.path %} active {% endif %}">
+                    {% url 'manage_Section' as manage_Section %}
+                    {% url 'edit_Section' Section_id as edit_Section %}
+                    <a href="{{manage_Section}}"
+                        class="nav-link  {% if edit_Section == request.path or manage_Section == request.path %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>
-                            Manage Department
+                            Manage Section
 
                         </p>
                     </a>

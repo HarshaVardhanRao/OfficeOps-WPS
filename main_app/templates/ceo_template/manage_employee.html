@@ -21,8 +21,8 @@
                                     <th>Full Name</th>
                                     <th>Email</th>
                                     <th>Gender</th>
-                                    <th>Division</th>
-                                    <th>Department</th>
+                                    <th>Standard</th>
+                                    <th>Section</th>
                                     <th>Avatar</th>
                                     <th>Edit</th>
                                 </tr>
@@ -34,8 +34,8 @@
                                     <td>{{employee.last_name}}, {{employee.first_name}}</td>
                                     <td>{{employee.email}}</td>
                                     <td>{{employee.gender}}</td>
-                                    <td>{{employee.employee.division.name}}</td>
-                                    <td>{{employee.employee.department.name}}</td>
+                                    <td>{{employee.employee.Standard.name}}</td>
+                                    <td>{{employee.employee.Section.name}}</td>
                                     <td>
                                         {% if employee.profile_pic == ""  %}
                                         No Image

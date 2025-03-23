@@ -16,36 +16,36 @@ from .models import *
 
 def employee_home(request):
     employee = get_object_or_404(Employee, admin=request.user)
-    total_department = Department.objects.filter(division=employee.division).count()
+    total_Section = Section.objects.filter(Standard=employee.Standard).count()
     total_attendance = AttendanceReport.objects.filter(employee=employee).count()
     total_present = AttendanceReport.objects.filter(employee=employee, status=True).count()
-    if total_attendance == 0:  # Don't divide. DivisionByZero
+    if total_attendance == 0:  # Don't divide. StandardByZero
         percent_absent = percent_present = 0
     else:
         percent_present = math.floor((total_present/total_attendance) * 100)
         percent_absent = math.ceil(100 - percent_present)
-    department_name = []
+    Section_name = []
     data_present = []
     data_absent = []
-    departments = Department.objects.filter(division=employee.division)
-    for department in departments:
-        attendance = Attendance.objects.filter(department=department)
+    Sections = Section.objects.filter(Standard=employee.Standard)
+    for Section in Sections:
+        attendance = Attendance.objects.filter(Section=Section)
         present_count = AttendanceReport.objects.filter(
             attendance__in=attendance, status=True, employee=employee).count()
         absent_count = AttendanceReport.objects.filter(
             attendance__in=attendance, status=False, employee=employee).count()
-        department_name.append(department.name)
+        Section_name.append(Section.name)
         data_present.append(present_count)
         data_absent.append(absent_count)
     context = {
         'total_attendance': total_attendance,
         'percent_present': percent_present,
         'percent_absent': percent_absent,
-        'total_department': total_department,
-        'departments': departments,
+        'total_Section': total_Section,
+        'Sections': Sections,
         'data_present': data_present,
         'data_absent': data_absent,
-        'data_name': department_name,
+        'data_name': Section_name,
         'page_title': 'Employee Homepage'
 
     }
@@ -56,22 +56,22 @@ def employee_home(request):
 def employee_view_attendance(request):
     employee = get_object_or_404(Employee, admin=request.user)
     if request.method != 'POST':
-        division = get_object_or_404(Division, id=employee.division.id)
+        Standard = get_object_or_404(Standard, id=employee.Standard.id)
         context = {
-            'departments': Department.objects.filter(division=division),
+            'Sections': Section.objects.filter(Standard=Standard),
             'page_title': 'View Attendance'
         }
         return render(request, 'employee_template/employee_view_attendance.html', context)
     else:
-        department_id = request.POST.get('department')
+        Section_id = request.POST.get('Section')
         start = request.POST.get('start_date')
         end = request.POST.get('end_date')
         try:
-            department = get_object_or_404(Department, id=department_id)
+            Section = get_object_or_404(Section, id=Section_id)
             start_date = datetime.strptime(start, "%Y-%m-%d")
             end_date = datetime.strptime(end, "%Y-%m-%d")
             attendance = Attendance.objects.filter(
-                date__range=(start_date, end_date), department=department)
+                date__range=(start_date, end_date), Section=Section)
             attendance_reports = AttendanceReport.objects.filter(
                 attendance__in=attendance, employee=employee)
             json_data = []

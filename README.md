@@ -1,6 +1,6 @@
 ## Table of Contents
 
-1. [Introduction](#officeops-workforce-productivity-suite)
+1. [Introduction](#GreenValleyMS-workforce-productivity-suite)
    - [Deployed Website](#deployed-website)
    - [Default Credentials](#default-credentials)
 2. [Features](#features)
@@ -12,13 +12,13 @@
 5. [Contributions](#contributions)
 6. [License](#license)
 
-# OfficeOps: Workforce Productivity Suite
+# GreenValleyMS: Workforce Productivity Suite
 
-OfficeOps is a powerful Workforce Productivity Suite built using Django, designed to streamline HR and office management processes within your organization. This project allows CEOs, Managers, and Employees to manage various aspects of HR, including employee information, attendance, feedback, and leave requests.
+GreenValleyMS is a powerful Workforce Productivity Suite built using Django, designed to streamline HR and office management processes within your organization. This project allows CEOs, Managers, and Employees to manage various aspects of HR, including employee information, attendance, feedback, and leave requests.
 
 ## Deployed Website
 
-You can access the deployed OfficeOps website at [officeops.onrender.com](https://officeops.onrender.com/).
+You can access the deployed GreenValleyMS website at [GreenValleyMS.onrender.com](https://GreenValleyMS.onrender.com/).
 
 ## Default Credentials
 
@@ -40,7 +40,7 @@ For Employee:
 
 - **Manage Your Team:** CEOs have full control to add, update, and remove Managers and Employees within the organization.
 
-- **Organize Company Structure:** CEOs can create and manage Divisions and Departments to structure the company efficiently.
+- **Organize Company Structure:** CEOs can create and manage Standards and Departments to structure the company efficiently.
 
 - **Track Employee Attendance:** Monitor employee attendance to ensure a productive workforce.
 
@@ -93,7 +93,7 @@ To set up this project on your local machine, follow these steps:
 
 1. Clone the repository:
 ```
-git clone https://github.com/Gaurav241/OfficeOps-WPS.git
+git clone https://github.com/Gaurav241/GreenValleyMS-WPS.git
 ```
 2. Create a virtual environment and activate it:
 ```
@@ -102,7 +102,7 @@ venv\Scripts\activate
 ```
 3. Navigate to the project directory and setup environment:
 ```
-cd OfficeOps-WPS
+cd GreenValleyMS-WPS
 ```
 Create .env File: Create a file named .env in the project directory. Add the following content to the .env file:
 or just rename .env.example to .env
@@ -134,7 +134,7 @@ python manage.py runserver
 
 ## Contributing
 
-Contributions are welcome! If you'd like to contribute to OfficeOps-WPS, feel free to open a pull request. We value your input and appreciate your help in making the app even better.
+Contributions are welcome! If you'd like to contribute to GreenValleyMS-WPS, feel free to open a pull request. We value your input and appreciate your help in making the app even better.
 
 ## License
 
