@@ -13,20 +13,20 @@ from .models import *
 
 def manager_home(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    total_employees = Employee.objects.filter(Standard=manager.Standard).count()
+    total_employees = Employee.objects.filter(standard=manager.standard).count()
     total_leave = LeaveReportManager.objects.filter(manager=manager).count()
-    Sections = Section.objects.filter(Standard=manager.Standard)
+    Sections = Section.objects.filter(standard=manager.standard)
     total_Section = Sections.count()
-    attendance_list = Attendance.objects.filter(Section__in=Sections)
+    attendance_list = Attendance.objects.filter(section__in=Sections)
     total_attendance = attendance_list.count()
     attendance_list = []
     Section_list = []
-    for Section in Sections:
-        attendance_count = Attendance.objects.filter(Section=Section).count()
-        Section_list.append(Section.name)
+    for sec in Sections:
+        attendance_count = Attendance.objects.filter(section=Sec).count()
+        Section_list.append(sec.name)
         attendance_list.append(attendance_count)
     context = {
-        'page_title': 'Manager Panel - ' + str(manager.admin.last_name) + ' (' + str(manager.Standard) + ')',
+        'page_title': 'Manager Panel - ' + str(manager.admin.last_name) + ' (' + str(manager.standard) + ')',
         'total_employees': total_employees,
         'total_attendance': total_attendance,
         'total_leave': total_leave,
@@ -39,7 +39,7 @@ def manager_home(request):
 
 def manager_take_attendance(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    Sections = Section.objects.filter(Standard=manager.Standard)
+    Sections = Section.objects.filter(standard=manager.standard)
     context = {
         'Sections': Sections,
         'page_title': 'Take Attendance'
@@ -50,10 +50,10 @@ def manager_take_attendance(request):
 
 @csrf_exempt
 def get_employees(request):
-    Section_id = request.POST.get('Section')
+    Section_id = request.POST.get('section')
     try:
         Section = get_object_or_404(Section, id=Section_id)
-        employees = Employee.objects.filter(Standard_id=Section.Standard.id)
+        employees = Employee.objects.filter(Standard_id=Section.standard.id)
         employee_data = []
         for employee in employees:
             data = {
@@ -71,13 +71,13 @@ def get_employees(request):
 def save_attendance(request):
     employee_data = request.POST.get('employee_ids')
     date = request.POST.get('date')
-    Section_id = request.POST.get('Section')
+    Section_id = request.POST.get('section')
     employees = json.loads(employee_data)
     try:
-        Section = get_object_or_404(Section, id=Section_id)
+        Sec = get_object_or_404(Section, id=Section_id)
 
         # Check if an attendance object already exists for the given date
-        attendance, created = Attendance.objects.get_or_create(Section=Section, date=date)
+        attendance, created = Attendance.objects.get_or_create(section=Sec, date=date)
 
         for employee_dict in employees:
             employee = get_object_or_404(Employee, id=employee_dict.get('id'))
@@ -98,7 +98,7 @@ def save_attendance(request):
 
 def manager_update_attendance(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    Sections = Section.objects.filter(Standard=manager.Standard)
+    Sections = Section.objects.filter(standard=manager.standard)
     context = {
         'Sections': Sections,
         'page_title': 'Update Attendance'
@@ -255,7 +255,7 @@ def manager_view_notification(request):
 
 def manager_add_salary(request):
     manager = get_object_or_404(Manager, admin=request.user)
-    Sections = Section.objects.filter(Standard=manager.Standard)
+    Sections = Section.objects.filter(standard=manager.standard)
     context = {
         'page_title': 'Salary Upload',
         'Sections': Sections
@@ -263,20 +263,20 @@ def manager_add_salary(request):
     if request.method == 'POST':
         try:
             employee_id = request.POST.get('employee_list')
-            Section_id = request.POST.get('Section')
+            Section_id = request.POST.get('section')
             base = request.POST.get('base')
             ctc = request.POST.get('ctc')
             employee = get_object_or_404(Employee, id=employee_id)
-            Section = get_object_or_404(Section, id=Section_id)
+            section = get_object_or_404(Section, id=Section_id)
             try:
                 data = EmployeeSalary.objects.get(
-                    employee=employee, Section=Section)
+                    employee=employee, section=section)
                 data.ctc = ctc
                 data.base = base
                 data.save()
                 messages.success(request, "Scores Updated")
             except:
-                salary = EmployeeSalary(employee=employee, Section=Section, base=base, ctc=ctc)
+                salary = EmployeeSalary(employee=employee, section=section, base=base, ctc=ctc)
                 salary.save()
                 messages.success(request, "Scores Saved")
         except Exception as e:
@@ -287,11 +287,11 @@ def manager_add_salary(request):
 @csrf_exempt
 def fetch_employee_salary(request):
     try:
-        Section_id = request.POST.get('Section')
+        Section_id = request.POST.get('section')
         employee_id = request.POST.get('employee')
         employee = get_object_or_404(Employee, id=employee_id)
-        Section = get_object_or_404(Section, id=Section_id)
-        salary = EmployeeSalary.objects.get(employee=employee, Section=Section)
+        section = get_object_or_404(Section, id=Section_id)
+        salary = EmployeeSalary.objects.get(employee=employee, section=section)
         salary_data = {
             'ctc': salary.ctc,
             'base': salary.base

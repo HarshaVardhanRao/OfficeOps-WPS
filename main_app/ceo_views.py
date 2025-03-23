@@ -119,14 +119,15 @@ def add_Standard(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
+            print(name)
             try:
-                Standard = Standard()
-                Standard.name = name
-                Standard.save()
+                standard = Standard()
+                standard.name = name
+                standard.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_Standard'))
             except:
-                messages.error(request, "Could Not Add")
+                messages.error(request, "Could Not Add Standard")
         else:
             messages.error(request, "Could Not Add")
     return render(request, 'ceo_template/add_Standard_template.html', context)
@@ -141,12 +142,13 @@ def add_Section(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            Standard = form.cleaned_data.get('Standard')
+            Standard = form.cleaned_data.get('standard')
+            print(Standard)
             try:
-                Section = Section()
-                Section.name = name
-                Section.Standard = Standard
-                Section.save()
+                section = Section()
+                section.name = name
+                section.standard = Standard
+                section.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_Section'))
 
@@ -458,10 +460,10 @@ def admin_view_attendance(request):
 
 @csrf_exempt
 def get_admin_attendance(request):
-    Section_id = request.POST.get('Section')
+    Section_id = request.POST.get('section')
     attendance_date_id = request.POST.get('attendance_date_id')
     try:
-        Section = get_object_or_404(Section, id=Section_id)
+        section = get_object_or_404(Section, id=Section_id)
         attendance = get_object_or_404(Attendance, id=attendance_date_id)
         attendance_reports = AttendanceReport.objects.filter(attendance=attendance)
         json_data = []
@@ -598,9 +600,9 @@ def delete_employee(request, employee_id):
 
 
 def delete_Standard(request, Standard_id):
-    Standard = get_object_or_404(Standard, id=Standard_id)
+    standard = get_object_or_404(Standard, id=Standard_id)
     try:
-        Standard.delete()
+        standard.delete()
         messages.success(request, "Standard deleted successfully!")
     except Exception:
         messages.error(
@@ -609,7 +611,7 @@ def delete_Standard(request, Standard_id):
 
 
 def delete_Section(request, Section_id):
-    Section = get_object_or_404(Section, id=Section_id)
-    Section.delete()
+    section = get_object_or_404(Section, id=Section_id)
+    section.delete()
     messages.success(request, "Section deleted successfully!")
     return redirect(reverse('manage_Section'))
