@@ -57,6 +57,7 @@ from datetime import datetime, date
 # Render Attendance Page
 def manager_take_employee_attendance(request):
     employees = Employee.objects.all()
+    print(employees)
     return render(request, 'manager_template/take_employee_attendance.html', {'employees': employees})
 
 # Save Attendance
@@ -83,7 +84,7 @@ def get_attendance(request):
     attendance = AttendanceEmployee.objects.filter(date=selected_date).first()
     if attendance:
         reports = AttendanceReport.objects.filter(attendance=attendance)
-        data = [{"employee": report.employee.admin.email, "check_in": report.check_in_time.strftime("%H:%M:%S")} for report in reports]
+        data = [{"employee": report.employee.admin.email, "check_in": report.created_at.strftime("%H:%M:%S")} for report in reports]
         return JsonResponse({"attendance": data})
     return JsonResponse({"attendance": []})
 

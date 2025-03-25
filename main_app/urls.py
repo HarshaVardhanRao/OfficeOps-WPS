@@ -82,9 +82,9 @@ urlpatterns = [
     path("manager/view/profile/", manager_views.manager_view_profile,
          name='manager_view_profile'),
     path("manager/attendance/take/", manager_views.manager_take_attendance,
-         name='manager_take_attendance'),
+         name='manager_take_attendance'),#student take attendance
     path("manager/attendance/update/", manager_views.manager_update_attendance,
-         name='manager_update_attendance'),
+         name='manager_update_attendance'),#student update attendance
     path("manager/get_employees/", manager_views.get_employees, name='get_employees'),
     path("manager/attendance/fetch/", manager_views.get_employee_attendance,
          name='get_employee_attendance'),
@@ -99,7 +99,7 @@ urlpatterns = [
     path('manager/save_student_attendance/', manager_views.save_student_attendance, name='save_student_attendance'),
     path('manager/get_attendance_dates/', manager_views.get_attendance_dates, name='get_attendance_dates'),
     path('manager/get_attendance_report/', manager_views.get_attendance_report, name='get_attendance_report'),
-    path('manager/take_employee_attendance/', views.manager_take_employee_attendance, name='take_employee_attendance'),
+    path('manager/take_employee_attendance/', views.manager_take_employee_attendance, name='take_employee_attendance'), # Employee Attendance
     path('manager/save_employee_attendance/', views.save_employee_attendance, name='save_employee_attendance'),
     path('manager/get_attendance/', views.get_attendance, name='get_attendance'),
 

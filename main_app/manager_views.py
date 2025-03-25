@@ -54,6 +54,9 @@ def manager_take_attendance(request):
 
 
 
+
+######################## Student Attendance Rechecked ####################################################
+
 @csrf_exempt
 def get_students(request):
     if request.method == "POST":
@@ -73,12 +76,14 @@ def save_student_attendance(request):
             section_id = data.get("section_id")
             student_ids = data.get("student_ids", [])
 
+            sec = Section.objects.get(id = section_id)
+
             if not attendance_date or not section_id or not student_ids:
                 return JsonResponse({"error": "Missing required fields"}, status=400)
 
             # Get or create an Attendance entry for the section & date
             attendance_entry, created = Attendance.objects.get_or_create(
-                section_id=section_id, date=attendance_date
+                section=sec, date=attendance_date
             )
 
             for student in student_ids:
@@ -124,7 +129,7 @@ def get_attendance_report(request):
         for report in reports
     ]
     return JsonResponse(data, safe=False)
-###############################################################################
+################################  employee attandance ###############################################
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -200,29 +205,6 @@ from .models import Attendance, AttendanceReportStudent, Section, StudentProfile
 import json
 from django.http import JsonResponse
 
-@csrf_exempt
-
-
-def save_student_attendance(request):
-    try:
-        data = json.loads(request.body.decode('utf-8'))
-        print("Received data:", data)  # ✅ Debugging Output
-
-        section_id = data.get("section_id")
-        attendance_date = data.get("date")
-        student_ids = data.get("student_ids")
-
-        print(f"Section ID: {section_id}, Date: {attendance_date}, Students: {student_ids}")  # ✅ Debugging Output
-
-        if not section_id or not attendance_date or not student_ids:
-            return JsonResponse({"error": "Missing data"}, status=400)
-
-        # Add your attendance saving logic here...
-
-        return JsonResponse({"message": "Attendance saved successfully"})
-    except Exception as e:
-        print("Error in save_student_attendance:", str(e))  # ✅ Debugging Output
-        return JsonResponse({"error": str(e)}, status=500)
 
 
 @csrf_exempt

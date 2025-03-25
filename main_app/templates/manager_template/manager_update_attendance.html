@@ -117,10 +117,11 @@
                 success: function(response) {
                     if (response.length > 0) {
                         let html = "";
-                        response.forEach(student => {
-                            let status = student.status ? "Present" : "Absent";
+                        response.forEach(Student => {
+                            let status = Student.status ? "Present" : "Absent";
+                            let name = Student.student_name;
                             html += `<tr>
-                                        <td>${student}</td>
+                                        <td>${name}</td>
                                         <td>${status}</td>
                                      </tr>`;
                         });
