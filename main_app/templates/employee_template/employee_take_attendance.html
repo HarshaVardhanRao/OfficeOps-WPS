@@ -1,95 +1,116 @@
-{% extends 'main_app/base.html' %}
-{% load static %}
-
-{% block page_title %}{{ page_title }}{% endblock page_title %}
-
-{% block content %}
+{% extends 'main_app/base.html' %} {% load static %} {% block page_title %}{{
+page_title }}{% endblock page_title %} {% block content %}
 <section class="content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">{{ page_title }}</h3>
-                    </div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card card-primary">
+					<div class="card-header">
+						<h3 class="card-title">{{ page_title }}</h3>
+					</div>
 
-                    <div class="card-body">
-                        <form method="POST" id="attendance_form">
-                            {% csrf_token %}
-                            <!-- Section Selection -->
-                            <div class="form-group">
-                                <label>Section</label>
-                                <select name="section" class="form-control" id='section_select'>
-                                    <option value="">-- Select Section --</option>
-                                    {% for section in Sections %}
-                                    <option value="{{ section.id }}">{{ section.standard.name }} - {{ section.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+					<div class="card-body">
+						<form method="POST" id="attendance_form">
+							{% csrf_token %}
+							<!-- Section Selection -->
+							<div class="form-group">
+								<label>Section</label>
+								<select
+									name="section"
+									class="form-control"
+									id="section_select"
+								>
+									<option value="">
+										-- Select Section --
+									</option>
+									{% for section in Sections %}
+									<option value="{{ section.id }}">
+										{{ section.standard.name }} - {{ section.name }}
+									</option>
+									{% endfor %}
+								</select>
+							</div>
 
-                            <!-- Date Selection -->
-                            <div class="form-group">
-                                <label>Attendance Date</label>
-                                <input type="date" class="form-control" name="attendance_date" id="attendance_date">
-                            </div>
-                        </form>
-                    </div>
+							<!-- Date Selection -->
+							<div class="form-group">
+								<label>Attendance Date</label>
+								<input
+									type="date"
+									class="form-control"
+									name="attendance_date"
+									id="attendance_date"
+								/>
+							</div>
+						</form>
+					</div>
 
-                    <div class="card-footer">
-                        <button type="button" id='fetch_students' class="btn btn-primary btn-block">Fetch Students</button>
-                        <div class="form-group" id="student_data"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+					<div class="card-footer">
+						<button
+							type="button"
+							id="fetch_students"
+							class="btn btn-primary btn-block"
+						>
+							Fetch Students
+						</button>
+						<div class="form-group" id="student_data"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
 
-{% endblock content %}
-
-{% block custom_js %}
+{% endblock content %} {% block custom_js %}
 <script>
-    function getCSRFToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
-    }
+	function getCSRFToken() {
+		return document.querySelector("[name=csrfmiddlewaretoken]").value;
+	}
 
-    $(document).ready(function () {
-        // Set default date to today
-        var today = new Date().toISOString().split('T')[0];
-        $("#attendance_date").val(today);
+	$(document).ready(function () {
+		// Set default date to today
+		var today = new Date().toISOString().split("T")[0];
+		$("#attendance_date").val(today);
 
-        $("#fetch_students").click(function () {
-            var sectionId = $("#section_select").val();
-            var attendance_date = $("#attendance_date").val();
-            $("#student_data").html("");  // Clear previous data
-            
-            if (!sectionId) {
-                alert("Please select a section");
-                return false;
-            }
+		$("#attendance_date").on("change", function () {
+			if ($("#attendance_date").val() > today) {
+				alert(`Select a date less than ${today}`);
+				$("#attendance_date").val(today);
+			}
+		});
 
-            $.ajax({
-                url: "{% url 'get_student' %}",
-                type: 'POST',
-                headers: {
-                    "X-CSRFToken": getCSRFToken()
-                },
-                data: {
-                    section_id: sectionId
-                }
-            }).done(function (json_data) {
-                if (json_data.length < 1) {
-                    alert("No students found in this section");
-                } else {
-                    var div_data = `
+		$("#fetch_students").click(function () {
+			var sectionId = $("#section_select").val();
+			var attendance_date = $("#attendance_date").val();
+			$("#student_data").html(""); // Clear previous data
+
+			if (!sectionId) {
+				alert("Please select a section");
+				return false;
+			}
+
+			$.ajax({
+				url: "{% url 'get_student' %}",
+				type: "POST",
+				headers: {
+					"X-CSRFToken": getCSRFToken(),
+				},
+				data: {
+					section_id: sectionId,
+				},
+			})
+				.done(function (json_data) {
+					if (json_data.length < 1) {
+						alert("No students found in this section");
+					} else {
+						var div_data = `
                         <hr/>
                         <div class='form-group'>
                             <label>Mark Attendance</label>
                             <div class='row'>
                     `;
 
-                    json_data.forEach(student => {
-                        div_data += `
+						json_data.forEach((student) => {
+							div_data += `
                             <div class='col-lg-3'>
                                 <div class='form-check custom-control custom-checkbox'>
                                     <input type='checkbox' class='custom-control-input' checked='checked' name='student_data[]' value="${student.id}" id='checkbox${student.id}'>
@@ -97,9 +118,9 @@
                                 </div>
                             </div>
                         `;
-                    });
+						});
 
-                    div_data += `
+						div_data += `
                             </div>
                         </div>
                         <div class='form-group'>
@@ -107,50 +128,56 @@
                         </div>
                     `;
 
-                    $("#student_data").html(div_data);
-                }
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                alert("Error: " + textStatus + " - " + errorThrown);
-            });
-        });
+						$("#student_data").html(div_data);
+					}
+				})
+				.fail(function (jqXHR, textStatus, errorThrown) {
+					alert("Error: " + textStatus + " - " + errorThrown);
+				});
+		});
 
-        // Save Attendance
-        $(document).on('click', '#save_attendance', function () {
-            var sectionId = $("#section_select").val();  // Get section again
-            var attendance_date = $('#attendance_date').val();
+		// Save Attendance
+		$(document).on("click", "#save_attendance", function () {
+			var sectionId = $("#section_select").val(); // Get section again
+			var attendance_date = $("#attendance_date").val();
 
-            if (!attendance_date) {
-                alert("Select a valid date");
-                return false;
-            }
+			if (!attendance_date) {
+				alert("Select a valid date");
+				return false;
+			}
 
-            var student_data = $("input[name='student_data[]']").map(function () {
-                return { 'id': $(this).val(), 'status': $(this).is(":checked") ? 1 : 0 };
-            }).get();
+			var student_data = $("input[name='student_data[]']")
+				.map(function () {
+					return {
+						id: $(this).val(),
+						status: $(this).is(":checked") ? 1 : 0,
+					};
+				})
+				.get();
 
-            $(this).attr("disabled", true).text("Saving Attendance...");
+			$(this).attr("disabled", true).text("Saving Attendance...");
 
-            $.ajax({
-                type: "POST",
-                url: "{% url 'save_student_attendance' %}",
-                headers: { "X-CSRFToken": getCSRFToken() },
-                data: JSON.stringify({
-                    section_id: sectionId,
-                    date: attendance_date,
-                    student_ids: student_data
-                }),
-                contentType: "application/json",
-                success: function(response) {
-                    console.log("✅ Response:", response);
-                    alert(response.message || "Attendance saved successfully!");
-                    location.reload();
-                },
-                error: function(xhr) {
-                    console.log("❌ AJAX Error:", xhr.responseText);
-                    alert("Error saving attendance.");
-                }
-            });
-        });
-    });
+			$.ajax({
+				type: "POST",
+				url: "{% url 'save_student_attendance' %}",
+				headers: { "X-CSRFToken": getCSRFToken() },
+				data: JSON.stringify({
+					section_id: sectionId,
+					date: attendance_date,
+					student_ids: student_data,
+				}),
+				contentType: "application/json",
+				success: function (response) {
+					console.log("✅ Response:", response);
+					alert(response.message || "Attendance saved successfully!");
+					location.reload();
+				},
+				error: function (xhr) {
+					console.log("❌ AJAX Error:", xhr.responseText);
+					alert("Error saving attendance.");
+				},
+			});
+		});
+	});
 </script>
 {% endblock custom_js %}

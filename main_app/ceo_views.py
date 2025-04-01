@@ -133,7 +133,7 @@ def add_Standard(request):
                 messages.error(request, "Could Not Add Standard")
         else:
             messages.error(request, "Could Not Add")
-    return render(request, 'ceo_template/add_Standard_template.html', context)
+    return render(request, 'ceo_template/add_standard_template.html', context)
 
 
 def add_Section(request):
@@ -160,7 +160,7 @@ def add_Section(request):
         else:
             messages.error(request, "Fill Form Properly")
 
-    return render(request, 'ceo_template/add_Section_template.html', context)
+    return render(request, 'ceo_template/add_section_template.html', context)
 
 
 def manage_manager(request):
@@ -187,7 +187,7 @@ def manage_Standard(request):
         'Standards': Standards,
         'page_title': 'Manage Standards'
     }
-    return render(request, "ceo_template/manage_Standard.html", context)
+    return render(request, "ceo_template/manage_standard.html", context)
 
 
 def manage_Section(request):
@@ -196,7 +196,7 @@ def manage_Section(request):
         'Sections': Sections,
         'page_title': 'Manage Sections'
     }
-    return render(request, "ceo_template/manage_Section.html", context)
+    return render(request, "ceo_template/manage_section.html", context)
 
 
 def edit_manager(request, manager_id):
