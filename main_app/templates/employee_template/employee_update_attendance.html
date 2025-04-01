@@ -78,7 +78,7 @@
             }
 
             $.ajax({
-                url: "{% url 'get_attendance_dates' %}",
+                url: "{% url 'get_attendance_date' %}",
                 type: 'GET',
                 data: { section_id: sectionId },
                 success: function(response) {
@@ -111,7 +111,7 @@
             }
 
             $.ajax({
-                url: "{% url 'get_attendance_report' %}",
+                url: "{% url 'get_attendance_reports' %}",
                 type: 'GET',
                 data: { section_id: sectionId, attendance_id: attendanceId },
                 success: function(response) {

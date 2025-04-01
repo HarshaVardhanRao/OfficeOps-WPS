@@ -56,7 +56,7 @@ def add_manager(request):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password')
-            Standard = form.cleaned_data.get('Standard')
+            standard = form.cleaned_data.get('Standard')
             passport = request.FILES.get('profile_pic')
             fs = FileSystemStorage()
             filename = fs.save(passport.name, passport)
@@ -66,7 +66,7 @@ def add_manager(request):
                     email=email, password=password, user_type=2, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.manager.Standard = Standard
+                user.manager.Standard = standard
                 user.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_manager'))
@@ -90,7 +90,7 @@ def add_employee(request):
             email = employee_form.cleaned_data.get('email')
             gender = employee_form.cleaned_data.get('gender')
             password = employee_form.cleaned_data.get('password')
-            Standard = employee_form.cleaned_data.get('Standard')
+            standard = employee_form.cleaned_data.get('Standard')
             Section = employee_form.cleaned_data.get('Section')
             passport = request.FILES['profile_pic']
             fs = FileSystemStorage()
@@ -101,7 +101,7 @@ def add_employee(request):
                     email=email, password=password, user_type=3, first_name=first_name, last_name=last_name, profile_pic=passport_url)
                 user.gender = gender
                 user.address = address
-                user.employee.Standard = Standard
+                user.employee.Standard = standard
                 user.employee.Section = Section
                 user.save()
                 messages.success(request, "Successfully Added")
@@ -145,12 +145,12 @@ def add_Section(request):
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            Standard = form.cleaned_data.get('standard')
-            print(Standard)
+            standard = form.cleaned_data.get('standard')
+            print(standard)
             try:
                 section = Section()
                 section.name = name
-                section.standard = Standard
+                section.standard = standard
                 section.save()
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_Section'))
@@ -216,7 +216,7 @@ def edit_manager(request, manager_id):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
-            Standard = form.cleaned_data.get('Standard')
+            standard = form.cleaned_data.get('Standard')
             passport = request.FILES.get('profile_pic') or None
             try:
                 user = CustomUser.objects.get(id=manager.admin.id)
@@ -233,7 +233,7 @@ def edit_manager(request, manager_id):
                 user.last_name = last_name
                 user.gender = gender
                 user.address = address
-                manager.Standard = Standard
+                manager.Standard = standard
                 user.save()
                 manager.save()
                 messages.success(request, "Successfully Updated")
@@ -265,7 +265,7 @@ def edit_employee(request, employee_id):
             email = form.cleaned_data.get('email')
             gender = form.cleaned_data.get('gender')
             password = form.cleaned_data.get('password') or None
-            Standard = form.cleaned_data.get('Standard')
+            standard = form.cleaned_data.get('Standard')
             Section = form.cleaned_data.get('Section')
             passport = request.FILES.get('profile_pic') or None
             try:
@@ -283,7 +283,7 @@ def edit_employee(request, employee_id):
                 user.last_name = last_name
                 user.gender = gender
                 user.address = address
-                employee.Standard = Standard
+                employee.Standard = standard
                 employee.Section = Section
                 user.save()
                 employee.save()
@@ -297,21 +297,21 @@ def edit_employee(request, employee_id):
         return render(request, "ceo_template/edit_employee_template.html", context)
 
 
-def edit_Standard(request, Standard_id):
-    instance = get_object_or_404(Standard, id=Standard_id)
+def edit_Standard(request, standard_id):
+    instance = get_object_or_404(Standard, id=standard_id)
     form = StandardForm(request.POST or None, instance=instance)
     context = {
         'form': form,
-        'Standard_id': Standard_id,
+        'Standard_id': standard_id,
         'page_title': 'Edit Standard'
     }
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
             try:
-                Standard = Standard.objects.get(id=Standard_id)
-                Standard.name = name
-                Standard.save()
+                Standard_in = Standard.objects.get(id=standard_id)
+                Standard_in.name = name
+                Standard_in.save()
                 messages.success(request, "Successfully Updated")
             except:
                 messages.error(request, "Could Not Update")
@@ -321,30 +321,40 @@ def edit_Standard(request, Standard_id):
     return render(request, 'ceo_template/edit_Standard_template.html', context)
 
 
-def edit_Section(request, Section_id):
-    instance = get_object_or_404(Section, id=Section_id)
+from .models import Standard, Section
+
+def edit_Section(request, section_id):
+    instance = get_object_or_404(Section, id=section_id)
     form = SectionForm(request.POST or None, instance=instance)
+
     context = {
         'form': form,
-        'Section_id': Section_id,
+        'Section_id': section_id,  # Optional: Use 'section_id' instead for consistency
         'page_title': 'Edit Section'
     }
+
     if request.method == 'POST':
         if form.is_valid():
             name = form.cleaned_data.get('name')
-            Standard = form.cleaned_data.get('Standard')
+            standard = form.cleaned_data.get('Standard')  # Use lowercase variable name
+
             try:
-                Section = Section.objects.get(id=Section_id)
-                Section.name = name
-                Section.Standard = Standard
-                Section.save()
+                section_instance = Section.objects.get(id=section_id)  # Avoid redefining Section
+                section_instance.name = name
+                section_instance.Standard = standard
+                section_instance.save()
+
                 messages.success(request, "Successfully Updated")
-                return redirect(reverse('edit_Section', args=[Section_id]))
+                return redirect(reverse('edit_Section', args=[section_id]))
+
             except Exception as e:
-                messages.error(request, "Could Not Add " + str(e))
+                messages.error(request, "Could Not Update: " + str(e))
+
         else:
             messages.error(request, "Fill Form Properly")
+
     return render(request, 'ceo_template/edit_Section_template.html', context)
+
 
 
 @csrf_exempt
@@ -614,8 +624,8 @@ def delete_employee(request, employee_id):
     return redirect(reverse('manage_employee'))
 
 
-def delete_Standard(request, Standard_id):
-    standard = get_object_or_404(Standard, id=Standard_id)
+def delete_Standard(request, standard_id):
+    standard = get_object_or_404(Standard, id=standard_id)
     try:
         standard.delete()
         messages.success(request, "Standard deleted successfully!")
@@ -625,8 +635,8 @@ def delete_Standard(request, Standard_id):
     return redirect(reverse('manage_Standard'))
 
 
-def delete_Section(request, Section_id):
-    section = get_object_or_404(Section, id=Section_id)
+def delete_Section(request, section_id):
+    section = get_object_or_404(Section, id=section_id)
     section.delete()
     messages.success(request, "Section deleted successfully!")
     return redirect(reverse('manage_Section'))

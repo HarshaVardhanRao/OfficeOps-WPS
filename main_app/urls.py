@@ -44,7 +44,7 @@ urlpatterns = [
     path("employee/view/leave/", ceo_views.view_employee_leave,
          name="view_employee_leave",),
     path("manager/view/leave/", ceo_views.view_manager_leave, name="view_manager_leave",),
-    path("attendance/view/", ceo_views.admin_view_attendance,
+    path("attendance/view/", manager_views.manager_update_attendance,
          name="admin_view_attendance",),
     path("attendance/fetch/", ceo_views.get_admin_attendance,
          name='get_admin_attendance'),
@@ -58,19 +58,19 @@ urlpatterns = [
     path("manager/delete/<int:manager_id>",
          ceo_views.delete_manager, name='delete_manager'),
 
-    path("Standard/delete/<int:Standard_id>",
+    path("Standard/delete/<int:standard_id>",
          ceo_views.delete_Standard, name='delete_Standard'),
 
-    path("Section/delete/<int:Section_id>",
+    path("Section/delete/<int:section_id>",
          ceo_views.delete_Section, name='delete_Section'),
 
     path("employee/delete/<int:employee_id>",
          ceo_views.delete_employee, name='delete_employee'),
     path("employee/edit/<int:employee_id>",
          ceo_views.edit_employee, name='edit_employee'),
-    path("Standard/edit/<int:Standard_id>",
+    path("Standard/edit/<int:standard_id>",
          ceo_views.edit_Standard, name='edit_Standard'),
-    path("Section/edit/<int:Section_id>",
+    path("Section/edit/<int:section_id>",
          ceo_views.edit_Section, name='edit_Section'),
 
 
@@ -96,7 +96,7 @@ urlpatterns = [
     path("manager/view/notification/", manager_views.manager_view_notification,
          name="manager_view_notification"),
     path('manager/get_students/', manager_views.get_students, name='get_students'),
-    path('manager/save_student_attendance/', manager_views.save_student_attendance, name='save_student_attendance'),
+    path('manager/save_student_attendances/', manager_views.save_student_attendance, name='save_student_attendances'),
     path('manager/get_attendance_dates/', manager_views.get_attendance_dates, name='get_attendance_dates'),
     path('manager/get_attendance_report/', manager_views.get_attendance_report, name='get_attendance_report'),
     path('manager/take_employee_attendance/', views.manager_take_employee_attendance, name='take_employee_attendance'), # Employee Attendance
@@ -110,6 +110,14 @@ urlpatterns = [
      path("employee/home/", employee_views.employee_home, name='employee_home'),
      path("employee/view/attendance/", employee_views.employee_view_attendance,
          name='employee_view_attendance'),
+     path("employee/attendance/take/", employee_views.manager_take_attendance,
+         name='employee_take_attendance'),#student take attendance
+    path("employee/attendance/update/", employee_views.manager_update_attendance,
+         name='employee_update_attendance'),#student update attendance
+     path('employee/get_student/', employee_views.get_students, name='get_student'),
+    path('employee/save_student_attendance/', employee_views.save_student_attendance, name='save_student_attendance'),
+    path('employee/get_attendance_date/', employee_views.get_attendance_date, name='get_attendance_date'),
+    path('employee/get_attendance_reports/', employee_views.get_attendance_report, name='get_attendance_reports'),
      path("employee/apply/leave/", employee_views.employee_apply_leave,
           name='employee_apply_leave'),
      path("employee/feedback/", employee_views.employee_feedback,

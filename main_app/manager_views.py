@@ -42,7 +42,7 @@ def manager_home(request):
 
 
 def manager_take_attendance(request):
-    manager = get_object_or_404(Manager, admin=request.user)
+    # manager = get_object_or_404(Manager, admin=request.user)
     Sections = Section.objects.all()
     print(Sections)
     context = {
@@ -161,10 +161,12 @@ def save_employee_attendance(request):
 
             # Create an attendance entry for the date
             attendance_entry, created = AttendanceEmployee.objects.get_or_create(date=date)
+            print(attendance_entry)
 
             # Save attendance for each employee
             for emp in employees:
                 employee_obj = Employee.objects.get(id=emp["id"])
+                print(employee_obj)
                 AttendanceReport.objects.update_or_create(
                     employee=employee_obj,
                     attendance=attendance_entry,
@@ -237,7 +239,13 @@ def save_attendance(request):
 
 
 def manager_update_attendance(request):
-    manager = get_object_or_404(Manager, admin=request.user)
+    try:
+        manager = get_object_or_404(Manager, admin=request.user)
+        if manager is None:
+            if request.user.is_superuser:
+                manager = request.user
+    except:
+        print("Manager Not found")
     Sections = Section.objects.all()
     context = {
         'Sections': Sections,
@@ -393,49 +401,49 @@ def manager_view_notification(request):
     return render(request, "manager_template/manager_view_notification.html", context)
 
 
-def manager_add_salary(request):
-    manager = get_object_or_404(Manager, admin=request.user)
-    Sections = Section.objects.filter(standard=manager.standard)
-    context = {
-        'page_title': 'Salary Upload',
-        'Sections': Sections
-    }
-    if request.method == 'POST':
-        try:
-            employee_id = request.POST.get('employee_list')
-            Section_id = request.POST.get('section')
-            base = request.POST.get('base')
-            ctc = request.POST.get('ctc')
-            employee = get_object_or_404(Employee, id=employee_id)
-            section = get_object_or_404(Section, id=Section_id)
-            try:
-                data = EmployeeSalary.objects.get(
-                    employee=employee, section=section)
-                data.ctc = ctc
-                data.base = base
-                data.save()
-                messages.success(request, "Scores Updated")
-            except:
-                salary = EmployeeSalary(employee=employee, section=section, base=base, ctc=ctc)
-                salary.save()
-                messages.success(request, "Scores Saved")
-        except Exception as e:
-            messages.warning(request, "Error Occured While Processing Form")
-    return render(request, "manager_template/manager_add_salary.html", context)
+# def manager_add_salary(request):
+#     manager = get_object_or_404(Manager, admin=request.user)
+#     Sections = Section.objects.filter(standard=manager.standard)
+#     context = {
+#         'page_title': 'Salary Upload',
+#         'Sections': Sections
+#     }
+#     if request.method == 'POST':
+#         try:
+#             employee_id = request.POST.get('employee_list')
+#             Section_id = request.POST.get('section')
+#             base = request.POST.get('base')
+#             ctc = request.POST.get('ctc')
+#             employee = get_object_or_404(Employee, id=employee_id)
+#             section = get_object_or_404(Section, id=Section_id)
+#             try:
+#                 data = EmployeeSalary.objects.get(
+#                     employee=employee, section=section)
+#                 data.ctc = ctc
+#                 data.base = base
+#                 data.save()
+#                 messages.success(request, "Scores Updated")
+#             except:
+#                 salary = EmployeeSalary(employee=employee, section=section, base=base, ctc=ctc)
+#                 salary.save()
+#                 messages.success(request, "Scores Saved")
+#         except Exception as e:
+#             messages.warning(request, "Error Occured While Processing Form")
+#     return render(request, "manager_template/manager_add_salary.html", context)
 
 
-@csrf_exempt
-def fetch_employee_salary(request):
-    try:
-        Section_id = request.POST.get('section')
-        employee_id = request.POST.get('employee')
-        employee = get_object_or_404(Employee, id=employee_id)
-        section = get_object_or_404(Section, id=Section_id)
-        salary = EmployeeSalary.objects.get(employee=employee, section=section)
-        salary_data = {
-            'ctc': salary.ctc,
-            'base': salary.base
-        }
-        return HttpResponse(json.dumps(salary_data))
-    except Exception as e:
-        return HttpResponse('False')
+# @csrf_exempt
+# def fetch_employee_salary(request):
+#     try:
+#         Section_id = request.POST.get('section')
+#         employee_id = request.POST.get('employee')
+#         employee = get_object_or_404(Employee, id=employee_id)
+#         section = get_object_or_404(Section, id=Section_id)
+#         salary = EmployeeSalary.objects.get(employee=employee, section=section)
+#         salary_data = {
+#             'ctc': salary.ctc,
+#             'base': salary.base
+#         }
+#         return HttpResponse(json.dumps(salary_data))
+#     except Exception as e:
+#         return HttpResponse('False')

@@ -69,7 +69,7 @@
             }
 
             $.ajax({
-                url: "{% url 'get_students' %}",
+                url: "{% url 'get_student' %}",
                 type: 'POST',
                 headers: {
                     "X-CSRFToken": getCSRFToken()
@@ -132,7 +132,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "{% url 'save_student_attendances' %}",
+                url: "{% url 'save_student_attendance' %}",
                 headers: { "X-CSRFToken": getCSRFToken() },
                 data: JSON.stringify({
                     section_id: sectionId,

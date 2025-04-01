@@ -16,36 +16,21 @@ from .models import *
 
 def employee_home(request):
     employee = get_object_or_404(Employee, admin=request.user)
-    total_Section = Section.objects.filter(Standard=employee.Standard).count()
+    total_Section = Section.objects.all().count()
     total_attendance = AttendanceReport.objects.filter(employee=employee).count()
     total_present = AttendanceReport.objects.filter(employee=employee, status=True).count()
-    if total_attendance == 0:  # Don't divide. StandardByZero
-        percent_absent = percent_present = 0
-    else:
-        percent_present = math.floor((total_present/total_attendance) * 100)
-        percent_absent = math.ceil(100 - percent_present)
-    Section_name = []
-    data_present = []
-    data_absent = []
-    Sections = Section.objects.filter(Standard=employee.Standard)
-    for Section in Sections:
-        attendance = Attendance.objects.filter(Section=Section)
-        present_count = AttendanceReport.objects.filter(
-            attendance__in=attendance, status=True, employee=employee).count()
-        absent_count = AttendanceReport.objects.filter(
-            attendance__in=attendance, status=False, employee=employee).count()
-        Section_name.append(Section.name)
-        data_present.append(present_count)
-        data_absent.append(absent_count)
+    total_absent = AttendanceReport.objects.filter(employee=employee, status=False).count()
+    Sections = Section.objects.all()
+
     context = {
         'total_attendance': total_attendance,
-        'percent_present': percent_present,
-        'percent_absent': percent_absent,
+        'percent_present': 50,
+        'percent_absent': 50,
         'total_Section': total_Section,
         'Sections': Sections,
-        'data_present': data_present,
-        'data_absent': data_absent,
-        'data_name': Section_name,
+        'data_present': 90,
+        'data_absent': 10,
+        'data_name': Sections,
         'page_title': 'Employee Homepage'
 
     }
@@ -67,11 +52,11 @@ def employee_view_attendance(request):
         start = request.POST.get('start_date')
         end = request.POST.get('end_date')
         try:
-            Section = get_object_or_404(Section, id=Section_id)
+            Sec = get_object_or_404(Section, id=Section_id)
             start_date = datetime.strptime(start, "%Y-%m-%d")
             end_date = datetime.strptime(end, "%Y-%m-%d")
             attendance = Attendance.objects.filter(
-                date__range=(start_date, end_date), Section=Section)
+                date__range=(start_date, end_date), Section=Sec)
             attendance_reports = AttendanceReport.objects.filter(
                 attendance__in=attendance, employee=employee)
             json_data = []
@@ -85,7 +70,139 @@ def employee_view_attendance(request):
         except Exception as e:
             return None
 
+######################Student Attendance#########################
+from django.contrib.auth.decorators import login_required
+def manager_take_attendance(request):
+    employee = get_object_or_404(Employee, admin=request.user)
+    Sections = Section.objects.all()
+    print(Sections)
+    context = {
+        'Sections': Sections,
+        'page_title': 'Take Attendance'
+    }
 
+    return render(request, 'employee_template/employee_take_attendance.html', context)
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+@csrf_exempt
+def get_students(request):
+    if request.method == "POST":
+        section_id = request.POST.get("section_id")
+
+        if not section_id:
+            return JsonResponse({"error": "Missing section ID"}, status=400)
+
+        students = StudentProfile.objects.filter(section_id=section_id).values("id", "student")
+
+        return JsonResponse(list(students), safe=False)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
+
+
+
+@csrf_exempt
+def save_student_attendance(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            attendance_date = data.get("date")
+            section_id = data.get("section_id")
+            student_ids = data.get("student_ids", [])
+
+            sec = Section.objects.get(id = section_id)
+
+            if not attendance_date or not section_id or not student_ids:
+                return JsonResponse({"error": "Missing required fields"}, status=400)
+
+            # Get or create an Attendance entry for the section & date
+            attendance_entry, created = Attendance.objects.get_or_create(
+                section=sec, date=attendance_date
+            )
+
+            for student in student_ids:
+                student_id = student.get("id")
+                status = student.get("status")
+
+                if student_id is not None:
+                    # Save attendance record for the student
+                    AttendanceReportStudent.objects.update_or_create(
+                        attendance=attendance_entry,
+                        student_id=student_id,
+                        defaults={"status": status}  # 1 = Present, 0 = Absent
+                    )
+
+            return JsonResponse({"message": "Attendance saved successfully!"}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format"}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+from django.http import JsonResponse
+from .models import Attendance
+
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def get_attendance_date(request):
+    section_id = request.GET.get("section_id")
+    if not section_id:
+        return JsonResponse({"error": "Invalid section ID"}, status=400)
+
+    attendance_dates = Attendance.objects.filter(section_id=section_id).values("id", "date")
+    return JsonResponse(list(attendance_dates), safe=False)
+
+
+
+from django.http import JsonResponse
+from .models import AttendanceReportStudent
+
+def get_attendance_report(request):
+    employee = get_object_or_404(Employee, admin=request.user)
+    attendance_id = request.GET.get("attendance_id")
+    reports = AttendanceReportStudent.objects.filter(attendance_id=attendance_id).select_related("student")
+
+    data = [
+        {"student_name": report.student.student, "status": report.status}
+        for report in reports
+    ]
+    return JsonResponse(data, safe=False)
+
+
+def manager_update_attendance(request):
+    # try:
+    #     manager = get_object_or_404(Manager, admin=request.user)
+    #     if manager is None:
+    #         if request.user.is_superuser:
+    #             manager = request.user
+    # except:
+    #     print("Manager Not found")
+    Sections = Section.objects.all()
+    context = {
+        'Sections': Sections,
+        'page_title': 'Update Attendance'
+    }
+
+    return render(request, 'employee_template/employee_update_attendance.html', context)
+
+from django.http import JsonResponse
+from .models import Attendance
+from .models import AttendanceReportStudent
+
+def get_attendance_report(request):
+    attendance_id = request.GET.get("attendance_id")
+    reports = AttendanceReportStudent.objects.filter(attendance_id=attendance_id).select_related("student")
+
+    data = [
+        {"student_name": report.student.student, "status": report.status}
+        for report in reports
+    ]
+    return JsonResponse(data, safe=False)
+
+##############################################################################################################
 def employee_apply_leave(request):
     form = LeaveReportEmployeeForm(request.POST or None)
     employee = get_object_or_404(Employee, admin_id=request.user.id)
