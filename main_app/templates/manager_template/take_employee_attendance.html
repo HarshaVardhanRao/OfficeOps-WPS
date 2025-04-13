@@ -1,4 +1,22 @@
 {% extends 'main_app/base.html' %}
+{% block custom_css %}
+<style>
+    .card-header {
+        background-color: transparent !important;
+        color: black !important;
+        text-align: center !important;
+    }
+    .card-title {
+        width: 100%;
+    }
+    .form-control {
+        margin-bottom: 10px;
+    }
+    .btn-block {
+        margin-top: 10px;
+    }
+</style>
+{% endblock %}
 {% block content %}
 <section class="content">
     <div class="container-fluid">
@@ -21,7 +39,7 @@
                         </select>
                     </div>
                     <div class="card-footer">
-                        <button id="mark_attendance" class="btn btn-success btn-block">Mark Attendance</button>
+                        <button id="mark_attendance" class="btn btn-success btn-block btn-primary">Mark Attendance</button>
                     </div>
                 </div>
             </div>

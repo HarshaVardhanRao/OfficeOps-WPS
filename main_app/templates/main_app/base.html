@@ -29,6 +29,61 @@
     <link rel="stylesheet" href="{% static 'plugins/summernote/summernote-bs4.css'%} ">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    <style>
+        body{
+            background: #EBF3FF;
+        }
+	.main-sidebar {
+		background: #2C3E50 !important;
+    border-radius: 0 24px 24px 0;
+	}
+  .nav-link.active{
+    background-color: #1ABC9C !important;
+  }
+  .card-header{
+        border-bottom: none !important;
+    }
+    .card-title{
+        font-size: 3rem !important;
+        width: 100% !important;
+        text-align: center;
+    }
+    .card-body, .card-footer{
+        max-width: 800px;
+        margin-inline: auto;
+    }
+
+    .btn-primary{
+        background-color: #1ABC9C !important;
+        border-color: #1ABC9C !important;
+    }
+    input{
+        accent-color: #1ABC9C !important;
+    }
+    select{
+        accent-color: #1ABC9C !important;
+    }
+    option:hover{
+        box-shadow: 0 0 10px 100px #1ABC9C inset;
+        color: white !important;
+    }
+    .same-bg{
+        background-color: #1ABC9C !important;
+        color: #fff !important;
+        border-radius: 24px;
+        padding: 1rem 0;
+    }
+    .same-bg .inner {
+        text-align: center;
+    }
+    .same-bg .inner h3, .same-bg .inner p {
+        margin: 0;
+        color: #fff !important;
+    }
+    .breadcrumb-item a {
+        color: #1ABC9C !important;
+    }
+</style>
     {% block custom_css %}
 
     {% endblock custom_css %}
@@ -52,8 +107,8 @@
         <!-- /.navbar -->
 
         <!-- Main Sidebar Container -->
-          
- 
+
+
         {% include "main_app/sidebar_template.html" with user=user %}
 
       
@@ -65,7 +120,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2">
                         <div class="col-sm-6">
-                            <h1 class="m-0 text-dark">{% block page_title %}{% endblock page_title %}</h1>
+                            <h1 class="m-0 text-dark"></h1>
                         </div><!-- /.col -->
                         <div class="col-sm-6">
                             
