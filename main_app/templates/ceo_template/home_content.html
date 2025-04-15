@@ -1,6 +1,24 @@
 {% extends 'main_app/base.html' %}
 {% load static %}
 {% block page_title %}{{page_title}}{% endblock page_title %}
+{% block custom_css %}
+<style>
+  .small-box-footer{
+    width: fit-content;
+    margin-inline: auto;
+    padding: 10px !important;
+    border-radius: 10px !important;
+  }
+  .card-header{
+		background-color: transparent !important;
+		color: black !important;
+		text-align: center !important;
+	}
+	.card-title{
+		width: 100%;
+	}
+</style>
+{% endblock custom_css %}
 {% block content %}
 <section class="content">
     <div class="container-fluid">
@@ -8,7 +26,7 @@
         <div class="row">
             <div class="col-lg-3 col-6">
                 <!-- small box -->
-                <div class="small-box bg-info">
+                <div class="small-box same-bg">
                     <div class="inner">
                         <h3>{{total_employees}}</h3>
 
@@ -24,7 +42,7 @@
             <!-- ./col -->
             <div class="col-lg-3 col-6">
                 <!-- small box -->
-                <div class="small-box bg-success">
+                <div class="small-box same-bg">
                     <div class="inner">
                         <h3>{{total_manager}}</h3>
 
@@ -39,7 +57,7 @@
             <!-- ./col -->
             <div class="col-lg-3 col-6">
                 <!-- small box -->
-                <div class="small-box bg-warning">
+                <div class="small-box same-bg">
                     <div class="inner">
                         <h3>{{total_Standard}}</h3>
 
@@ -54,7 +72,7 @@
             <!-- ./col -->
             <div class="col-lg-3 col-6">
                 <!-- small box -->
-                <div class="small-box bg-danger">
+                <div class="small-box same-bg">
                     <div class="inner">
                         <h3>{{total_Section}}</h3>
 
@@ -76,12 +94,6 @@
                 <div class="card card-secondary">
                   <div class="card-header">
                     <h3 class="card-title">{{page_title}}</h3>
-    
-                    <div class="card-tools">
-                      <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
-                      </button>
-                      <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                    </div>
                   </div>
                   <div class="card-body">
                     <div class="chart">
@@ -94,12 +106,6 @@
                     <div class="card card-secondary">
               <div class="card-header">
                 <h3 class="card-title">{{page_title}}</h3>
-
-                <div class="card-tools">
-                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
-                  </button>
-                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
-                </div>
               </div>
               <div class="card-body">
                 <div class="chart">

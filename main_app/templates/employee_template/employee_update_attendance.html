@@ -4,14 +4,14 @@
 {% block page_title %}View Attendance Report{% endblock page_title %}
 
 {% block content %}
+<div class="card-header">
+    <h3 class="card-title">View Attendance Report</h3>
+</div>
 <section class="content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">View Attendance Report</h3>
-                    </div>
 
                     <div class="card-body">
                         <!-- Select Section -->
@@ -40,7 +40,7 @@
 
                         <!-- Fetch Attendance Report -->
                         <div class="form-group">
-                            <button type="button" id="fetch_attendance_report" class="btn btn-success btn-block" style="display: none;">
+                            <button type="button" id="fetch_attendance_report" class="btn btn-primary btn-block" style="display: none;">
                                 Fetch Attendance Report
                             </button>
                         </div>
