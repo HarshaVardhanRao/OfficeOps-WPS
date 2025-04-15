@@ -5,9 +5,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.views.decorators.csrf import csrf_exempt
-
+import pandas as pd
 from .EmailBackend import EmailBackend
-from .models import Attendance, Section
+from .models import Attendance, Section, StudentProfile, Standard, CustomUser
 
 # Create your views here.
 
@@ -196,3 +196,43 @@ messaging.setBackgroundMessageHandler(function (payload) {
 });
     """
     return HttpResponse(data, content_type='application/javascript')
+
+def bulk_student_upload(request):
+    if request.method == "POST":
+        data = request.FILES['studentData']
+        student_data = pd.read_excel(data)
+        print(student_data)
+        for index, row in student_data.iterrows():
+            new_student = StudentProfile()
+            new_student.student = row['name']
+            new_student.standard, _ = Standard.objects.get_or_create(name=row['standard'])
+            new_student.section, _ = Section.objects.get_or_create(name=row['section'], standard=new_student.standard)
+            new_student.dob = row['dob']
+            new_student.address = row['address']
+            new_student.aadhar = row['aadhar']
+            new_student.save()
+        return HttpResponse("Success")
+    
+    else:
+        return render(request, 'bulkdata.html', {"formname": "studentData"})
+    
+def bulk_employee_upload(request):
+    if request.method == "POST":
+        employee_data = request.FILES.get('employee_data')
+        if employee_data:
+            emp_data = pd.read_excel(employee_data)
+            for index, row in emp_data.iterrows():
+                first_name = row['first_name']
+                last_name = row['last_name']
+                address = row['address']
+                email = row['email']
+                gender = row['gender']
+                password = str(row['password'])
+                user = CustomUser.objects.create_user(
+                    email=email, password=password, user_type=3, first_name=first_name, last_name=last_name)
+                user.gender = gender
+                user.address = address
+                user.save()
+                messages.success(request, "Successfully Added")
+            return HttpResponse("Successfully Added")
+    return render(request, 'bulkdata.html', {"formname": "employee_data"})

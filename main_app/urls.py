@@ -102,7 +102,8 @@ urlpatterns = [
     path('manager/take_employee_attendance/', views.manager_take_employee_attendance, name='take_employee_attendance'), # Employee Attendance
     path('manager/save_employee_attendance/', views.save_employee_attendance, name='save_employee_attendance'),
     path('manager/get_attendance/', views.get_attendance, name='get_attendance'),
-
+    path('bulk_students/', views.bulk_student_upload, name='bulk_students'),
+    path('bulk_employees/', views.bulk_employee_upload, name='bulk_employees'),
 
 
 
