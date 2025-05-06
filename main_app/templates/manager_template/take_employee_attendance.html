@@ -27,6 +27,8 @@
                         <h3 class="card-title">Take Employee Attendance</h3>
                     </div>
                     <div class="card-body">
+                        <div id="qr-reader" style="width: 300px;"></div>
+                        <div id="qr-reader-results"></div>
                         <label for="employee_id">Employee ID</label>
                         <input type="text" id="employee_id" class="form-control" placeholder="Enter Employee ID">
                         <br>
@@ -102,4 +104,18 @@
     document.getElementById("attendance_date").addEventListener("change", loadAttendance);
     window.onload = loadAttendance;
 </script>
+<script src="https://unpkg.com/html5-qrcode"></script>  
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Example: call fetchEmployeeDetails automatically after scanning QR code
+    function onScanSuccess(decodedText) {
+        $('#employee_id').val(decodedText);
+        $('option[value="' + decodedText + '"]').prop('selected', true);
+    }
+
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", { fps: 10, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+
 {% endblock content %}
