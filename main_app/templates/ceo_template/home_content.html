@@ -89,20 +89,7 @@
         <!-- /.row -->
         <!-- Main row -->
         <div class="row">
-            <div class="col-md-6">
-                <!-- LINE CHART -->
-                <div class="card card-secondary">
-                  <div class="card-header">
-                    <h3 class="card-title">{{page_title}}</h3>
-                  </div>
-                  <div class="card-body">
-                    <div class="chart">
-                      <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                    </div>
-                  </div></div>
-                  <!-- /.card-body -->
-                </div>
-                <div class="col-md-6">
+                <div class="col-lg-12">
                     <div class="card card-secondary">
               <div class="card-header">
                 <h3 class="card-title">{{page_title}}</h3>
@@ -125,31 +112,11 @@
 {% block custom_js %}
   <script>
       $(document).ready(function(){
-        var donutData        = {
-            labels: ['Employees', 'Manager'],
-            datasets: [
-              {
-                data:[{{total_employees}}, {{total_manager}}],
-                backgroundColor : ['#00a65a', '#f39c12',],
-              }
-            ]
-          }
-        var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
-        var pieData        = donutData;
-        var pieOptions     = {
-          maintainAspectRatio : false,
-          responsive : true,
-        }
-        //Create pie or douhnut chart
-        // You can switch between pie and douhnut using the method below.
-        var pieChart = new Chart(pieChartCanvas, {
-          type: 'pie',
-          data: pieData,
-          options: pieOptions      
-        });
+
 
         var Section_list = {{ Section_list|safe|escape }};
         var attendance_list = {{ attendance_list }};
+        var attendance_percentage_list = {{ attendance_percentage_list }}
   
             var barChartData = {
       labels  : Section_list,
@@ -163,7 +130,7 @@
         pointStrokeColor    : 'rgba(60,141,188,1)',
         pointHighlightFill  : '#fff',
         pointHighlightStroke: 'rgba(60,141,188,1)',
-        data                : attendance_list
+        data                : attendance_percentage_list
       }, 
       
       ]

@@ -81,10 +81,13 @@ def save_employee_attendance(request):
 # Fetch Attendance Data
 def get_attendance(request):
     selected_date = request.GET.get("date", date.today())
-    attendance = AttendanceEmployee.objects.filter(date=selected_date).first()
+    attendance = AttendanceEmployee.objects.filter(date=selected_date)
+    print(attendance)
     if attendance:
-        reports = AttendanceReport.objects.filter(attendance=attendance)
+        reports = AttendanceReport.objects.filter(attendance__in=attendance)
+        print(reports)
         data = [{"employee": report.employee.admin.email, "check_in": report.created_at.strftime("%H:%M:%S")} for report in reports]
+        print(data)
         return JsonResponse({"attendance": data})
     return JsonResponse({"attendance": []})
 

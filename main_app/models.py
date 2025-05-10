@@ -46,6 +46,7 @@ class CustomUser(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+    emp_id = models.SmallIntegerField(default=25)
     objects = CustomUserManager()
 
     def __str__(self):

@@ -18,30 +18,52 @@ from .models import *
 from .models import Section
 
 
+from datetime import date
+
+from datetime import date
+
 def admin_home(request):
-    total_manager = Manager.objects.all().count()
-    total_employees = Employee.objects.all().count()
-    Sections = Section.objects.all()
+    total_manager = Manager.objects.count()
+    total_employees = Employee.objects.count()
+    Sections = Section.objects.select_related('standard').all()
     total_Section = Sections.count()
-    total_Standard = Standard.objects.all().count()
-    attendance_list = Attendance.objects.filter(section__in=Sections)
-    total_attendance = attendance_list.count()
-    attendance_list = []
+    total_Standard = Standard.objects.count()
+
     Section_list = []
+    attendance_list = []
+    attendance_percentage_list = []
+
+    today = date.today()
+
     for section in Sections:
-        attendance_count = Attendance.objects.filter(section=section).count()
-        Section_list.append(section.name[:7])
-        attendance_list.append(attendance_count)
+        total_students = StudentProfile.objects.filter(section=section).count()
+        attendance = Attendance.objects.filter(section=section, date=today).first()
+
+        if attendance:
+            present_students = AttendanceReportStudent.objects.filter(
+                attendance=attendance,
+                status=True
+            ).count()
+        else:
+            present_students = 0
+
+        percentage = (present_students / total_students) * 100 if total_students > 0 else 0
+
+        Section_list.append(f"{section.standard.name}-{section.name}")
+        attendance_list.append(present_students)
+        attendance_percentage_list.append(round(percentage, 2))
+
     context = {
         'page_title': "Administrative Dashboard",
         'total_employees': total_employees,
         'total_manager': total_manager,
         'total_Standard': total_Standard,
         'total_Section': total_Section,
-        'Section_list': Section_list,
-        'attendance_list': attendance_list
-
+        'Section_list': Section_list,  # For chart labels or display
+        'attendance_list': attendance_list,  # Present count per section
+        'attendance_percentage_list':   attendance_percentage_list,  # Percentage per section
     }
+
     return render(request, 'ceo_template/home_content.html', context)
 
 
@@ -79,37 +101,122 @@ def add_manager(request):
     return render(request, 'ceo_template/add_manager_template.html', context)
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.files.storage import FileSystemStorage
+from django.urls import reverse
+from .forms import EmployeeForm
+from .models import CustomUser
+from django.http import HttpResponse
+
+from django.core.files.storage import FileSystemStorage
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.contrib import messages
+from .forms import EmployeeForm
+from .models import CustomUser, Employee  # if moved to a utils.py, otherwise remove
+import csv
+from django.core.files.storage import FileSystemStorage
+from django.contrib import messages
+from io import TextIOWrapper
+from .models import CustomUser, Employee  # Adjust the import if needed
+
+def handle_uploaded_file(request, file):
+    try:
+        data = TextIOWrapper(file.file, encoding='utf-8')
+        csv_reader = csv.reader(data)
+        headers = next(csv_reader)  # Skip header row
+
+        for row in csv_reader:
+            if len(row) != 10:
+                messages.warning(request, f"Skipping row due to incorrect column count: {row}")
+                continue
+
+            try:
+                name, designation, emp_id, cell_no, blood_group, dob, aadhaar, email, address, gender = row
+
+                # Split full name
+                parts = name.strip().split(' ', 1)
+                title = parts[0]
+                full_name = parts[1] if len(parts) > 1 else ""
+                first_name = full_name.split()[0] if full_name else ""
+                last_name = ' '.join(full_name.split()[1:]) if len(full_name.split()) > 1 else ""
+
+                if CustomUser.objects.filter(email=email).exists():
+                    messages.info(request, f"Skipped duplicate: {email}")
+                    continue
+
+                user = CustomUser.objects.create_user(
+                    email=email,
+                    password="defaultpassword123",  # You can set a default or random one
+                    user_type=3,
+                    first_name=first_name,
+                    last_name=last_name,
+                    gender=gender,
+                    address=address,
+                    emp_id=int(emp_id)
+                )
+                user.save()
+                Employee.objects.create(admin=user)
+
+            except Exception as e:
+                messages.error(request, f"Error processing row {row}: {e}")
+                continue
+
+        messages.success(request, "CSV uploaded successfully.")
+    except Exception as e:
+        messages.error(request, f"Failed to process file: {e}")
+
 def add_employee(request):
     employee_form = EmployeeForm(request.POST or None, request.FILES or None)
     context = {'form': employee_form, 'page_title': 'Add Employee'}
+
     if request.method == 'POST':
+        # Handle CSV Upload
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            handle_uploaded_file(request, file)
+            return redirect(reverse('add_employee'))
+
+        # Handle Single Form Entry
         if employee_form.is_valid():
-            first_name = employee_form.cleaned_data.get('first_name')
-            last_name = employee_form.cleaned_data.get('last_name')
-            address = employee_form.cleaned_data.get('address')
-            email = employee_form.cleaned_data.get('email')
-            gender = employee_form.cleaned_data.get('gender')
-            password = employee_form.cleaned_data.get('password')
-            standard = employee_form.cleaned_data.get('Standard')
-            Section = employee_form.cleaned_data.get('Section')
-            passport = request.FILES['profile_pic']
-            fs = FileSystemStorage()
-            filename = fs.save(passport.name, passport)
-            passport_url = fs.url(filename)
             try:
+                first_name = employee_form.cleaned_data.get('first_name')
+                last_name = employee_form.cleaned_data.get('last_name')
+                address = employee_form.cleaned_data.get('address')
+                email = employee_form.cleaned_data.get('email')
+                gender = employee_form.cleaned_data.get('gender')
+                password = employee_form.cleaned_data.get('password')
+                standard = employee_form.cleaned_data.get('Standard')
+                section = employee_form.cleaned_data.get('Section')
+                passport = request.FILES['profile_pic']
+                fs = FileSystemStorage()
+                filename = fs.save(passport.name, passport)
+                passport_url = fs.url(filename)
+
                 user = CustomUser.objects.create_user(
-                    email=email, password=password, user_type=3, first_name=first_name, last_name=last_name, profile_pic=passport_url)
-                user.gender = gender
-                user.address = address
-                user.employee.Standard = standard
-                user.employee.Section = Section
+                    email=email,
+                    password=password,
+                    user_type=3,
+                    first_name=first_name,
+                    last_name=last_name,
+                    profile_pic=passport_url,
+                    gender=gender,
+                    address=address
+                )
                 user.save()
+                emp = Employee.objects.create(admin=user)
+                emp.Standard = standard
+                emp.Section = section
+                emp.save()
+
                 messages.success(request, "Successfully Added")
                 return redirect(reverse('add_employee'))
             except Exception as e:
                 messages.error(request, "Could Not Add: " + str(e))
         else:
-            messages.error(request, "Could Not Add: ")
+            messages.error(request, "Invalid form data.")
+    
     return render(request, 'ceo_template/add_employee_template.html', context)
 
 
@@ -318,7 +425,7 @@ def edit_Standard(request, standard_id):
         else:
             messages.error(request, "Could Not Update")
 
-    return render(request, 'ceo_template/edit_Standard_template.html', context)
+    return render(request, 'ceo_template/edit_standard_template.html', context)
 
 
 from .models import Standard, Section
@@ -353,7 +460,7 @@ def edit_Section(request, section_id):
         else:
             messages.error(request, "Fill Form Properly")
 
-    return render(request, 'ceo_template/edit_Section_template.html', context)
+    return render(request, 'ceo_template/edit_section_template.html', context)
 
 
 
@@ -640,3 +747,4 @@ def delete_Section(request, section_id):
     section.delete()
     messages.success(request, "Section deleted successfully!")
     return redirect(reverse('manage_Section'))
+
