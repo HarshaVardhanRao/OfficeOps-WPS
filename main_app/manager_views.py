@@ -13,7 +13,14 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import Attendance, StudentProfile
 from .forms import *
 from .models import *
-
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from .models import Examination, ExaminationSubject, Subject, Standard, Section, StudentProfile, StudentMark
+from .forms import *
+import openpyxl
+from django.http import HttpResponse
 
 def manager_home(request):
     manager = get_object_or_404(Manager, admin=request.user)
@@ -401,49 +408,71 @@ def manager_view_notification(request):
     return render(request, "manager_template/manager_view_notification.html", context)
 
 
-# def manager_add_salary(request):
-#     manager = get_object_or_404(Manager, admin=request.user)
-#     Sections = Section.objects.filter(standard=manager.standard)
-#     context = {
-#         'page_title': 'Salary Upload',
-#         'Sections': Sections
-#     }
-#     if request.method == 'POST':
-#         try:
-#             employee_id = request.POST.get('employee_list')
-#             Section_id = request.POST.get('section')
-#             base = request.POST.get('base')
-#             ctc = request.POST.get('ctc')
-#             employee = get_object_or_404(Employee, id=employee_id)
-#             section = get_object_or_404(Section, id=Section_id)
-#             try:
-#                 data = EmployeeSalary.objects.get(
-#                     employee=employee, section=section)
-#                 data.ctc = ctc
-#                 data.base = base
-#                 data.save()
-#                 messages.success(request, "Scores Updated")
-#             except:
-#                 salary = EmployeeSalary(employee=employee, section=section, base=base, ctc=ctc)
-#                 salary.save()
-#                 messages.success(request, "Scores Saved")
-#         except Exception as e:
-#             messages.warning(request, "Error Occured While Processing Form")
-#     return render(request, "manager_template/manager_add_salary.html", context)
+def manager_add_examination(request):
+    if request.method == 'POST':
+        # You should create a form for this, here is a simple version
+        name = request.POST.get('name')
+        standard_id = request.POST.get('standard')
+        section_id = request.POST.get('section')
+        subjects = request.POST.getlist('subjects[]')
+        max_marks = request.POST.getlist('max_marks[]')
+        conducted_dates = request.POST.getlist('conducted_dates[]')
+        standard = Standard.objects.get(id=standard_id)
+        section = Section.objects.get(id=section_id)
+        exam = Examination.objects.create(name=name, standard=standard, section=section)
+        for i, subject_name in enumerate(subjects):
+            subject_name_clean = subject_name.strip()
+            subject = Subject.objects.filter(name__iexact=subject_name_clean).first()
+            if not subject:
+                subject = Subject.objects.create(name=subject_name_clean)
+            ExaminationSubject.objects.create(
+                examination=exam,
+                subject=subject,
+                max_marks=max_marks[i],
+                conducted_date=conducted_dates[i]
+            )
+        return redirect('manager_download_marks_template', exam_id=exam.id)
+    standards = Standard.objects.all()
+    sections = Section.objects.all()
+    return render(request, 'manager_template/manager_add_examination.html', {
+        'standards': standards,
+        'sections': sections
+    })
 
+def manager_download_marks_template(request, exam_id):
+    exam = Examination.objects.get(id=exam_id)
+    exam_subjects = ExaminationSubject.objects.filter(examination=exam)
+    students = StudentProfile.objects.filter(standard=exam.standard, section=exam.section)
+    import openpyxl
+    from openpyxl.utils import get_column_letter
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Marks Entry'
+    ws.append(['Student Name', 'Student ID'] + [f'{es.subject.name}' for es in exam_subjects])
+    for student in students:
+        ws.append([student.student, student.id] + ['' for _ in exam_subjects])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=marks_template_{exam.name}.xlsx'
+    wb.save(response)
+    return response
 
-# @csrf_exempt
-# def fetch_employee_salary(request):
-#     try:
-#         Section_id = request.POST.get('section')
-#         employee_id = request.POST.get('employee')
-#         employee = get_object_or_404(Employee, id=employee_id)
-#         section = get_object_or_404(Section, id=Section_id)
-#         salary = EmployeeSalary.objects.get(employee=employee, section=section)
-#         salary_data = {
-#             'ctc': salary.ctc,
-#             'base': salary.base
-#         }
-#         return HttpResponse(json.dumps(salary_data))
-#     except Exception as e:
-#         return HttpResponse('False')
+@csrf_exempt
+def manager_upload_marks(request, exam_id):
+    exam = Examination.objects.get(id=exam_id)
+    exam_subjects = list(ExaminationSubject.objects.filter(examination=exam))
+    if request.method == 'POST' and request.FILES.get('file'):
+        wb = openpyxl.load_workbook(request.FILES['file'])
+        ws = wb.active
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            student_id = row[1]
+            student = StudentProfile.objects.get(id=student_id)
+            for idx, exam_subject in enumerate(exam_subjects):
+                marks = row[2+idx]
+                if marks is not None and marks != '':
+                    StudentMark.objects.update_or_create(
+                        student=student,
+                        exam_subject=exam_subject,
+                        defaults={'marks_obtained': marks}
+                    )
+        return redirect('manager_home')
+    return render(request, 'manager_template/manager_upload_marks.html', {'exam': exam})

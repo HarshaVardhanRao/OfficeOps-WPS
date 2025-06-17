@@ -228,6 +228,18 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="/ceo/examination/select-upload/" class="nav-link">
+                        <i class="nav-icon fas fa-upload"></i>
+                        <p>Upload Marks</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/ceo/add-examination/" class="nav-link">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>Add Examination</p>
+                    </a>
+                </li>
 {% elif request.user.user_type == '2' %}
     <!-- Brand Logo -->
     <a href="#" class="brand-link">
@@ -335,6 +347,12 @@
                            Feedback
 
                         </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'manager_add_examination' %}" class="nav-link">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>Examination Marks</p>
                     </a>
                 </li>
 
@@ -452,6 +470,18 @@
                            Feedback
 
                         </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/employee/examination/select-upload/" class="nav-link">
+                        <i class="nav-icon fas fa-upload"></i>
+                        <p>Upload Marks</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/employee/add-examination/" class="nav-link">
+                        <i class="nav-icon fas fa-book"></i>
+                        <p>Add Examination</p>
                     </a>
                 </li>
 

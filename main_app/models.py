@@ -177,6 +177,37 @@ class NotificationEmployee(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+class Examination(models.Model):
+    name = models.CharField(max_length=120)
+    standard = models.ForeignKey(Standard, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.standard} - {self.section})"
+
+class Subject(models.Model):
+    name = models.CharField(max_length=120)
+    def __str__(self):
+        return self.name
+
+class ExaminationSubject(models.Model):
+    examination = models.ForeignKey(Examination, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    max_marks = models.PositiveIntegerField()
+    conducted_date = models.DateField()
+    def __str__(self):
+        return f"{self.examination} - {self.subject}"
+
+class StudentMark(models.Model):
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    exam_subject = models.ForeignKey(ExaminationSubject, on_delete=models.CASCADE)
+    marks_obtained = models.FloatField(null=True, blank=True)
+    def __str__(self):
+        return f"{self.student} - {self.exam_subject}: {self.marks_obtained}"
+
+
 @receiver(post_save, sender=CustomUser)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

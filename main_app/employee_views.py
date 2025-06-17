@@ -9,6 +9,9 @@ from django.shortcuts import (HttpResponseRedirect, get_object_or_404,
                               redirect, render)
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+import openpyxl
+from .models import Examination, ExaminationSubject, StudentProfile, StudentMark, Standard, Section, Subject
+from django.contrib.auth.decorators import login_required
 
 from .forms import *
 from .models import *
@@ -50,7 +53,7 @@ def employee_view_attendance(request):
     else:
         Section_id = request.POST.get('Section')
         start = request.POST.get('start_date')
-        end = request.POST.get('end_date')
+       
         try:
             Sec = get_object_or_404(Section, id=Section_id)
             start_date = datetime.strptime(start, "%Y-%m-%d")
@@ -322,3 +325,90 @@ def employee_view_salary(request):
         'page_title': "View Salary"
     }
     return render(request, "employee_template/employee_view_salary.html", context)
+
+
+@login_required
+def employee_download_marks_template(request, exam_id):
+    exam = Examination.objects.get(id=exam_id)
+    exam_subjects = ExaminationSubject.objects.filter(examination=exam)
+    students = StudentProfile.objects.filter(standard=exam.standard, section=exam.section)
+    from openpyxl.utils import get_column_letter
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = 'Marks Entry'
+    ws.append(['Student Name', 'Student ID'] + [f'{es.subject.name}' for es in exam_subjects])
+    for student in students:
+        ws.append([student.student, student.id] + ['' for _ in exam_subjects])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename=marks_template_{exam.name}.xlsx'
+    wb.save(response)
+    return response
+
+@csrf_exempt
+def employee_upload_marks(request, exam_id):
+    exam = Examination.objects.get(id=exam_id)
+    exam_subjects = list(ExaminationSubject.objects.filter(examination=exam))
+    if request.method == 'POST' and request.FILES.get('file'):
+        wb = openpyxl.load_workbook(request.FILES['file'])
+        ws = wb.active
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            student_id = row[1]
+            student = StudentProfile.objects.get(id=student_id)
+            for idx, exam_subject in enumerate(exam_subjects):
+                marks = row[2+idx]
+                if marks is not None and marks != '':
+                    StudentMark.objects.update_or_create(
+                        student=student,
+                        exam_subject=exam_subject,
+                        defaults={'marks_obtained': marks}
+                    )
+        messages.success(request, 'Marks uploaded successfully!')
+        return redirect('employee_view_profile')
+    return render(request, 'employee_template/employee_upload_marks.html', {'exam': exam})
+
+from django.shortcuts import render, redirect
+
+@login_required
+def employee_select_exam_upload(request):
+    examinations = Examination.objects.all()
+    exam_id = request.GET.get('exam_id')
+    if exam_id:
+        return render(request, 'employee_template/employee_select_exam_upload.html', {'examinations': examinations, 'exam_id': exam_id})
+    return render(request, 'employee_template/employee_select_exam_upload.html', {'examinations': examinations})
+
+from django.shortcuts import render, redirect
+
+@login_required
+def employee_add_examination(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        standard_id = request.POST.get('standard')
+        section_id = request.POST.get('section')
+        subjects = request.POST.getlist('subjects[]')
+        max_marks = request.POST.getlist('max_marks[]')
+        conducted_dates = request.POST.getlist('conducted_dates[]')
+        standard = Standard.objects.get(id=standard_id)
+        section = Section.objects.get(id=section_id)
+        exam = Examination.objects.create(name=name, standard=standard, section=section)
+        for i, subject_name in enumerate(subjects):
+            subject_name_clean = subject_name.strip()
+            subject = Subject.objects.filter(name__iexact=subject_name_clean).first()
+            if not subject:
+                subject = Subject.objects.create(name=subject_name_clean)
+            ExaminationSubject.objects.create(
+                examination=exam,
+                subject=subject,
+                max_marks=max_marks[i],
+                conducted_date=conducted_dates[i]
+            )
+        return render(request, 'employee_template/employee_add_examination.html', {
+            'standards': Standard.objects.all(),
+            'sections': Section.objects.all(),
+            'exam_id': exam.id
+        })
+    standards = Standard.objects.all()
+    sections = Section.objects.all()
+    return render(request, 'employee_template/employee_add_examination.html', {
+        'standards': standards,
+        'sections': sections
+    })

@@ -1,0 +1,84 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Add Examination{% endblock page_title %}
+
+{% block content %}
+<div class="card-header">
+    <h3 class="card-title">Add Examination</h3>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-primary">
+                    <div class="card-body">
+                        <form method="POST" id="exam_form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>Examination Name</label>
+                                <input type="text" name="name" class="form-control" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Standard</label>
+                                <select name="standard" class="form-control" required>
+                                    <option value="">-- Select Standard --</option>
+                                    {% for std in standards %}
+                                    <option value="{{ std.id }}">{{ std.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Section</label>
+                                <select name="section" class="form-control" required>
+                                    <option value="">-- Select Section --</option>
+                                    {% for sec in sections %}
+                                    <option value="{{ sec.id }}">{{ sec.standard.name }} - {{ sec.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <hr/>
+                            <h5>Subjects</h5>
+                            <div id="subjects_container">
+                                <div class="row subject_row">
+                                    <div class="col-md-4">
+                                        <label>Subject</label>
+                                        <input type="text" name="subjects[]" class="form-control subject-input" required placeholder="Enter subject name" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Max Marks</label>
+                                        <input type="number" name="max_marks[]" class="form-control" required />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label>Conducted Date</label>
+                                        <input type="date" name="conducted_dates[]" class="form-control" required />
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger remove_subject" style="display:none;">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-info mt-2" id="add_subject">Add Subject</button>
+                            <div class="card-footer mt-3">
+                                <button type="submit" class="btn btn-primary btn-block">Create Examination</button>
+                            </div>
+                        </form>
+                        {% if exam_id %}
+                        <div class="mt-4">
+                            <a href="{% url 'ceo_download_marks_template' exam_id=exam_id %}" class="btn btn-success">Download Marks Excel Template</a>
+                        </div>
+                        <div class="mt-2">
+                            <form method="POST" enctype="multipart/form-data" action="{% url 'ceo_upload_marks' exam_id=exam_id %}">
+                                {% csrf_token %}
+                                <label>Upload Filled Excel:</label>
+                                <input type="file" name="file" accept=".xlsx" required />
+                                <button type="submit" class="btn btn-primary">Upload Marks</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

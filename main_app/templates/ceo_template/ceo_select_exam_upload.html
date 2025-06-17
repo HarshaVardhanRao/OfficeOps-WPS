@@ -1,0 +1,34 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Select Examination to Upload Marks{% endblock page_title %}
+
+{% block content %}
+<div class="card-header">
+    <h3 class="card-title">Select Examination</h3>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form method="get" action="">
+                    <div class="form-group">
+                        <label for="exam">Examination</label>
+                        <select name="exam_id" id="exam" class="form-control" required>
+                            <option value="">-- Select Examination --</option>
+                            {% for exam in examinations %}
+                            <option value="{{ exam.id }}">{{ exam.name }} ({{ exam.standard.name }} - {{ exam.section.name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Proceed to Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% if exam_id %}
+<script>
+    window.location.href = "/ceo/examination/{{ exam_id }}/upload-marks/";
+</script>
+{% endif %}
+{% endblock content %}

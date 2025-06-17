@@ -97,7 +97,7 @@ urlpatterns = [
     path("manager/view/notification/", manager_views.manager_view_notification,
          name="manager_view_notification"),
     path('manager/get_students/', manager_views.get_students, name='get_students'),
-    path('manager/save_student_attendances/', manager_views.save_student_attendance, name='save_student_attendances'),
+    path('manager/save_student_attendances/', manager_views.save_student_attendance, name='save_student_attendance'),
     path('manager/get_attendance_dates/', manager_views.get_attendance_dates, name='get_attendance_dates'),
     path('manager/get_attendance_report/', manager_views.get_attendance_report, name='get_attendance_report'),
     path('manager/take_employee_attendance/', views.manager_take_employee_attendance, name='take_employee_attendance'), # Employee Attendance
@@ -130,6 +130,15 @@ urlpatterns = [
           name='employee_fcmtoken'),
      path("employee/view/notification/", employee_views.employee_view_notification,
          name="employee_view_notification"),
-
-
+    path('manager/add-examination/', manager_views.manager_add_examination, name='manager_add_examination'),
+    path('manager/examination/<int:exam_id>/download-template/', manager_views.manager_download_marks_template, name='manager_download_marks_template'),
+    path('manager/examination/<int:exam_id>/upload-marks/', manager_views.manager_upload_marks, name='manager_upload_marks'),
+    path('ceo/examination/<int:exam_id>/download-template/', ceo_views.ceo_download_marks_template, name='ceo_download_marks_template'),
+    path('ceo/examination/<int:exam_id>/upload-marks/', ceo_views.ceo_upload_marks, name='ceo_upload_marks'),
+    path('employee/examination/<int:exam_id>/download-template/', employee_views.employee_download_marks_template, name='employee_download_marks_template'),
+    path('employee/examination/<int:exam_id>/upload-marks/', employee_views.employee_upload_marks, name='employee_upload_marks'),
+    path('ceo/examination/select-upload/', ceo_views.ceo_select_exam_upload, name='ceo_select_exam_upload'),
+    path('employee/examination/select-upload/', employee_views.employee_select_exam_upload, name='employee_select_exam_upload'),
+    path('ceo/add-examination/', ceo_views.ceo_add_examination, name='ceo_add_examination'),
+    path('employee/add-examination/', employee_views.employee_add_examination, name='employee_add_examination'),
 ]

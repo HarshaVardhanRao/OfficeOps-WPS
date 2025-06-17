@@ -1,0 +1,25 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}Upload Marks{% endblock page_title %}
+
+{% block content %}
+<div class="card-header">
+    <h3 class="card-title">Upload Marks Excel</h3>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="file">Select Excel File</label>
+                        <input type="file" name="file" id="file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
