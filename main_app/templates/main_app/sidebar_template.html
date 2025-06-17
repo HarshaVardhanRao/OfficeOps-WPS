@@ -151,7 +151,7 @@
                             <i class="nav-icon fas fa-th"></i>
                             <p>
                                 View Student Attendance
-    
+
                             </p>
                         </a>
                     </li>
@@ -162,7 +162,7 @@
                     <i class="nav-icon fas fa-th"></i>
                     <p>
                         Employee Feedback
-                            
+
                         </p>
                     </a>
                 </li>
@@ -173,7 +173,7 @@
                         <i class="nav-icon fas fa-th"></i>
                         <p>
                             Manager Feedback
-                            
+
                         </p>
                     </a>
                 </li>
@@ -184,7 +184,7 @@
                         <i class="nav-icon fas fa-th"></i>
                         <p>
                             Manager Leave
-                            
+
                         </p>
                     </a>
                 </li>
@@ -195,7 +195,7 @@
                         <i class="nav-icon fas fa-th"></i>
                         <p>
                             Employee Leave
-                            
+
                         </p>
                     </a>
                 </li>
@@ -216,6 +216,15 @@
                         <p>
                             Notify Employee
 
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    {% url 'admin_notice' as admin_notice %}
+                    <a href="{{admin_notice}}" class="nav-link {% if admin_notice == request.path %} active {% endif %}">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            Send Notice
                         </p>
                     </a>
                 </li>
@@ -328,11 +337,11 @@
                         </p>
                     </a>
                 </li>
-          
+
 {% else %}
     <!-- Brand Logo -->
     <a href="" class="brand-link">
-        
+
         <img src="{% static 'dist/img/AdminLTELogo.png' %} " alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3" style="opacity: .8">
         <span class="brand-text font-weight-light">Employee Panel</span>
@@ -385,26 +394,26 @@
                         </p>
                     </a>
                 </li> {% endcomment %}
-                
+
                 <li class="nav-item">
                     {% url 'employee_take_attendance' as employee_take_attendance %}
-                    <a href="{{ employee_take_attendance }}" 
+                    <a href="{{ employee_take_attendance }}"
                        class="nav-link {% if request.resolver_match.url_name == 'employee_take_attendance' %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>Mark Student Attendance</p>
                     </a>
                 </li>
-                
+
                 <li class="nav-item">
                     {% url 'employee_update_attendance' as employee_update_attendance %}
-                    <a href="{{ employee_update_attendance }}" 
+                    <a href="{{ employee_update_attendance }}"
                        class="nav-link {% if request.resolver_match.url_name == 'employee_update_attendance' %} active {% endif %}">
                         <i class="nav-icon fas fa-th"></i>
                         <p>View Student Attendance</p>
                     </a>
                 </li>
-                
-          
+
+
                 {% comment %} <li class="nav-item">
                     {% url 'employee_view_attendance' as employee_view_attendance %}
                     <a href="{{employee_view_attendance}}" class="nav-link {% if employee_view_attendance == request.path %} active {% endif %}">
@@ -445,7 +454,7 @@
                         </p>
                     </a>
                 </li>
-          
+
 {% endif %}
 
 

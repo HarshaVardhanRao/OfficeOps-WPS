@@ -72,6 +72,7 @@ urlpatterns = [
          ceo_views.edit_Standard, name='edit_Standard'),
     path("Section/edit/<int:section_id>",
          ceo_views.edit_Section, name='edit_Section'),
+    path("SendNotice", ceo_views.send_Notice, name="admin_notice"),
 
 
     # Manager
@@ -129,6 +130,6 @@ urlpatterns = [
           name='employee_fcmtoken'),
      path("employee/view/notification/", employee_views.employee_view_notification,
          name="employee_view_notification"),
-    
+
 
 ]

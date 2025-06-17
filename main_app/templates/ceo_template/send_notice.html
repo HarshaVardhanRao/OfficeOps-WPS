@@ -1,0 +1,142 @@
+{% extends 'main_app/base.html' %}
+{% load static %}
+{% block page_title %}{{page_title}}{% endblock page_title %}
+
+{% block custom_css %}
+<style>
+    form{
+        display: flex;
+        flex-direction: column;
+    }
+    .input-field{
+        display: flex;
+        flex-direction: column;
+    }
+    .radio-buttons{
+        display: flex;
+        gap: 10px;
+    }
+    button{
+        border-radius: 10px;
+        outline: none;
+        border: none;
+        padding: 10px;
+    }
+    .message{
+        color: green;
+    }
+</style>
+{% endblock %}
+{% block content %}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">{{page_title}}</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <form method="POST" class="card-body">
+                        {% csrf_token %}
+                        <div class="input-field">
+                        <label for="subject">Subject:</label>
+                        <input name="subject" id="subject" />
+                        </div>
+                        <div class="input-field">
+                        <label for="content">Content:</label>
+                        <textarea name="content" id="content" rows="5" cols="50"></textarea>
+                        </div>
+                        <div class="input-field">
+                        <label for="">Message Type:</label>
+                        <div class="radio-buttons">
+                            <div class="radio-button">
+                                <input type="radio" name="type" id="type-mail" value="mail">
+                                <label for="type-mail">Mail</label>
+                            </div>
+                            <div class="radio-button">
+                                <input type="radio" name="type" id="type-whatsapp" value="whatsapp">
+                                <label for="type-whatsapp">Whatsapp</label>
+                            </div>
+                        </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Send Message</button>
+                        <div class="message">{{ message }}</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class = "modal fade" id = "myModal" tabindex = "-1" role = "dialog"
+   aria-labelledby = "myModalLabel" aria-hidden = "true">
+
+   <div class = "modal-dialog">
+      <div class = "modal-content">
+
+         <div class = "modal-header">Send Notification
+            <button type = "button" class = "close" data-dismiss = "modal" aria-hidden = "true">
+                  &times;
+            </button>
+
+
+         </div>
+
+         <div class = "modal-body">
+            <div class="form-group">
+                <input type="text" id="message" class='form-control'>
+                <input type="hidden"  id="manager_id" class='form-control'>
+            </div>
+         </div>
+
+         <div class = "modal-footer">
+            <button type = "button" class = "btn btn-default" data-dismiss = "modal">
+               Close
+            </button>
+
+            <button type = "button" id='send' class = "btn btn-success send_notification">
+               Send Notification
+            </button>
+         </div>
+
+      </div><!-- /.modal-content -->
+   </div><!-- /.modal-dialog -->
+
+</div><!-- /.modal -->
+{% endblock content %}
+{% block custom_js %}
+  <script>
+      $(".show_notification").click(function(){
+          $("#manager_id").val($(this).val())
+      })
+      $(".send_notification").click(function(){
+          var id = $("#manager_id").val()
+          var message = $("#message").val()
+          sendNotification(id,message);
+      })
+    function sendNotification(id,message){
+        $.ajax({
+            url: "{% url 'send_manager_notification' %}",
+            type: 'POST',
+            data: {
+                id: id,
+                message:message
+            }
+        }).done(function (response) {
+
+          if (response == 'True'){
+            alert("Notification Sent");
+            location.reload();
+          }else{
+            alert("Notification could not be saved. Please try again.");
+          }
+
+        }).fail(function (response) {
+            alert("Error in saving token")
+        })
+
+    }
+
+  </script>
+{% endblock custom_js %}

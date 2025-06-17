@@ -216,7 +216,7 @@ def add_employee(request):
                 messages.error(request, "Could Not Add: " + str(e))
         else:
             messages.error(request, "Invalid form data.")
-    
+
     return render(request, 'ceo_template/add_employee_template.html', context)
 
 
@@ -748,3 +748,41 @@ def delete_Section(request, section_id):
     messages.success(request, "Section deleted successfully!")
     return redirect(reverse('manage_Section'))
 
+from .tasks import send_email_async
+from twilio.rest import Client
+import os
+
+account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+
+client = Client(account_sid, auth_token)
+
+def send_Notice(request):
+    if request.method == "POST":
+        subject = request.POST.get('subject')
+        content = request.POST.get('content')
+        notice_type = request.POST.get('type')
+        print(content, notice_type)
+
+        if notice_type == 'mail':
+            recipients = ['hvijapuram@gmail.com', 'maheshkumarvmk2@gmail.com', 'vailetimaheshkumar1@gmail.com', 'hv767197@gmail.com', 'e.reddyrohith@gmail.com']
+            for recipient in recipients:
+                send_email_async.delay(
+                    subject,
+                    content,
+                    "maheshkumarvmk0@gmail.com",
+                    [recipient]
+                )
+        elif notice_type == 'whatsapp':
+            message = client.messages.create(
+                from_='whatsapp:+14155238886',
+                # content_sid='HXb5b62575e6e4ff6129ad7c8efe1f983e',
+                # content_variables='{"1":"12/1","2":"3pm"}',
+                body="Hello This is testing",
+                to='whatsapp:+919398983918'
+                )
+
+            print(message.sid)
+
+        return render(request, "ceo_template/send_notice.html", {"page_title": "Send Notice", "message": "Notice Sent Successfully"})
+    return render(request, "ceo_template/send_notice.html", {"page_title": "Send Notice"})
